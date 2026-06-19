@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>红源π | 井冈山革命博物馆数字展厅</title>
+    <!-- 引入 Tailwind CSS v4 体验极致流畅的视觉 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- 引入 Vue 3 驱动核心交互 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入苹果同款极简图标库 Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* 苹果官网专属的无衬线系统字体 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* 隐藏滚动条但保留滚动功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-[#f5f5f7] text-[#1d1d1f] antialiased min-h-screen">
+
+<div id="app">
+    <!-- 1. Apple-style 毛玻璃顶部导航栏 -->
+    <nav class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#f5f5f7]/70 border-b border-[#d2d2d7]/30 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
+            <!-- Team Logo -->
+            <div class="flex items-center space-x-2 cursor-pointer" @click="resetFilters">
+                <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">红源π</span>
+                <span class="text-[#86868b] text-xs font-light">|</span>
+                <span class="text-[#1d1d1f] text-sm font-medium tracking-wide">数字革命展厅</span>
+            </div>
+            
+            <!-- 极简搜索框 -->
+            <div class="relative w-64 md:w-80">
+                <input v-model="searchQuery" type="text" placeholder="搜索革命文物..." 
+                       class="w-full bg-[#e8e8ed]/60 text-xs rounded-full pl-9 pr-4 py-1.5 focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-500/50 transition-all duration-200 text-[#1d1d1f]">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#86868b]"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Hero 巨幕巨幅留白区 -->
+    <header class="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+        <p class="text-xs font-semibold tracking-widest text-red-600 uppercase mb-3">红源π 数字化时代巨献</p >
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
+            井冈山革命文物 <br>
+            <span class="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 bg-clip-text text-transparent">在 3D 空间里重燃</span>
+        </h1>
+        <p class="text-lg md:text-xl text-[#86868b] mt-6 max-w-2xl mx-auto font-normal leading-relaxed">
+            重塑时空记忆。点击任意独家精选卡片，即刻开启苹果级沉浸式 3D 革命文物交互体验。
+        </p >
+    </header>
+
+    <!-- 3. 全局筛选器控制台 (横向滚动胶囊) -->
+    <section class="max-w-7xl mx-auto px-6 mb-12">
+        <div class="flex items-center space-x-3 overflow-x-auto no-scrollbar py-2">
+            <button @click="selectedPeriod = ''" 
+                    :class="selectedPeriod === '' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-[#e8e8ed]' "
+                    class="text-xs font-medium px-4 py-2 rounded-full transition-all duration-200 shadow-sm whitespace-nowrap cursor-pointer">
+                全部时代
+            </button>
+            <button v-for="p in periods" :key="p" @click="selectedPeriod = p"
+                    :class="selectedPeriod === p ? 'bg-red-600 text-white' : 'bg-white text-[#1d1d1f] hover:bg-[#e8e8ed]' "
+                    class="text-xs font-medium px-4 py-2 rounded-full transition-all duration-200 shadow-sm whitespace-nowrap cursor-pointer">
+                {{ p }}
+            </button>
+        </div>
+    </section>
+
+    <!-- 4. Bento Box (便当盒) 卡片式网格流 -->
+    <main class="max-w-7xl mx-auto px-6 pb-24">
+        <!-- 空状态提示 -->
+        <div v-if="filteredRelics.length === 0" class="text-center py-20">
+            <i data-lucide="inbox" class="w-12 h-12 mx-auto text-[#86868b] stroke-1"></i>
+            <p class="text-[#86868b] mt-4 text-sm">未能找到符合条件的文物</p >
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 每一个卡片都是一件艺术品 -->
+            <div v-for="item in filteredRelics" :key="item.id" @click="open3DModal(item)"
+                 class="group bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#d2d2d7]/20 overflow-hidden cursor-pointer transform hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between h-[260px] p-6 relative">
+                
+                <!-- 卡片内部流白与标签 -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md bg-red-50 text-red-600">
+                            {{ item.category || '珍贵文物' }}
+                        </span>
+                        <span class="text-[11px] text-[#86868b] font-mono">ID: jgs{{ item.id }}</span>
+                    </div>
+                    
+                    <!-- 标题采用苹果经典的紧凑粗体 -->
+                    <h3 class="text-lg font-bold text-[#1d1d1f] leading-snug group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
+                        {{ item.name }}
+                    </h3>
+                </div>
+
+                <!-- 卡片底部元数据 -->
+                <div class="mt-4 border-t border-[#f5f5f7] pt-4 flex justify-between items-end">
+                    <div class="space-y-0.5">
+                        <p class="text-xs text-[#86868b]">年代：<span class="text-[#1d1d1f] font-medium">{{ item.period }}</span></p >
+                        <p class="text-xs text-[#86868b]">材质：<span class="text-[#1d1d1f] font-medium">{{ item.material || '复合材质' }}</span></p >
+                    </div>
+                    <!-- 交互箭头动效 -->
+                    <div class="w-8 h-8 rounded-full bg-[#f5f5f7] group-hover:bg-red-600 flex items-center justify-center transition-all duration-300">
+                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-[#1d1d1f] group-hover:text-white transition-colors duration-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 5. Apple Theater 沉浸式 3D 展厅弹窗 (Modal) -->
+    <transition name="fade">
+        <div v-if="currentRelic" class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4 md:p-10">
+            <!-- 背景暗化遮罩 -->
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="closeModal"></div>
+            
+            <!-- 核心剧幕外壳 -->
+            <div class="bg-[#1d1d1f] w-full max-w-6xl h-full rounded-3xl overflow-hidden shadow-2xl flex flex-col relative z-10 border border-white/10 animate-in fade-in zoom-in-95 duration-300">
+                
+                <!-- 视窗控制头部 -->
+                <div class="px-6 py-4 bg-black/40 border-b border-white/5 flex justify-between items-center">
+                    <div class="text-white">
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-red-500">红源π Spatiotemporal Rendering</span>
+                        <h2 class="text-base md:text-lg font-bold tracking-tight mt-0.5">{{ currentRelic.name }}</h2>
+                    </div>
+                    <button @click="closeModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-200 cursor-pointer">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                
+                <!-- 3D 渲染核心区 -->
+                <div class="flex-1 bg-black relative">
+                    <iframe :src="currentRelic.link" class="w-full h-full border-0" allowfullscreen></iframe>
+                </div>
+
+                <!-- 视窗底部数据面板 -->
+                <div class="px-6 py-4 bg-black/40 border-t border-white/5 flex flex-wrap gap-6 text-xs text-[#86868b]">
+                    <div>级别：<span class="text-white font-medium">{{ currentRelic.level || '国家级文物' }}</span></div>
+                    <div v-if="currentRelic.spec">规格：<span class="text-white font-medium">{{ currentRelic.spec }}</span></div>
+                    <div>数据源：井冈山革命博物馆</div>
+                </div>
+            </div>
+        </div>
+    </transition>
+</div>
+
+<script>
+const { createApp, ref, computed, onMounted, nextTick } = Vue;
+
+// 从 jgsxiaowenwu.xlsx 自动生成的 44 件文物数据
+const relicsData = [
+  { id: 1, name: "1930年代初期湘赣省地方武装使用的抬枪", spec: "枪管直径4.1cm", period: "1930年代初期", material: "木，铁", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs71&v=1" },
+  { id: 2, name: "明太师木圈椅", spec: "", period: "明代", material: "木", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs81&v=1" },
+  { id: 3, name: "民国龙凤椅", spec: "", period: "民国", material: "复合材质", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs82&v=1" },
+  { id: 4, name: "民国无纹带铜烟盒", spec: "", period: "民国", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs83&v=1" },
+  { id: 5, name: "民国无纹铜烟杆", spec: "", period: "民国", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs84&v=1" },
+  { id: 6, name: "1928年红军送给李尚发的搪瓷杯", spec: "底径10cm，通高14cm", period: "1928年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs85&v=1" },
+  { id: 7, name: "1928年黄洋界保卫战群众给红军送子弹使用的木箱", spec: "长26cm，宽19.5cm，高10.5cm", period: "1928年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs86&v=1" },
+  { id: 8, name: "1928年宁冈县四区二乡工农兵政府使用的马灯残架", spec: "底口径14.2cm，通高35cm", period: "1928年", material: "铁", category: "办公用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs87&v=1" },
+  { id: 9, name: "1928年宁冈县四区二乡工农兵政府使用的马灯", spec: "底径14.2cm，通高35cm", period: "1928年", material: "玻璃，铁", category: "办公用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs88&v=1" },
+  { id: 10, name: "1949年天津解放时黄克诚赠陈正人的半导体收音机", spec: "通长15cm，通宽29cm，通高18.5cm", period: "1949年", material: "铁，其他无机质", category: "名人遗物", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs89&v=1" },
+  { id: 11, name: "1928年永新县某乡工农兵政府主席尹初官使用的印盒", spec: "长5.4cm，宽1.8cm，厚1.5cm", period: "1928年", material: "铁", category: "玺印符牌", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs90&v=1" },
+  { id: 12, name: "1928年红军送给井冈山群众李富祥的铜脸盆", spec: "口径34cm，底径20cm，通高7.5cm", period: "1928年", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs91&v=1" },
+  { id: 13, name: "1928年红军打土豪分给宁冈县群众的绣花小脚布鞋", spec: "长14.8cm，宽4.4cm，厚8.5cm", period: "1928年", material: "棉麻纤维", category: "服装标识", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs92&v=1" },
+  { id: 14, name: "清镂雕描金人文故事图案诗词挂屏", spec: "纵154cm，横194cm，厚3cm", period: "清", material: "木", category: "雕塑", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs93&v=1" },
+  { id: 15, name: "20世纪20年代初期原湘军赵恒惕部第二旅二团士兵贺国中使用的铜笔架", spec: "纵9cm，横4cm，高7.4cm", period: "20世纪20年代初期", material: "铜", category: "名人遗物", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs94&v=1" },
+  { id: 16, name: "1926年「永新六区厚溪第五乡农民协会」条形木印", spec: "纵9.8cm，横1.8cm，厚2.8cm", period: "1926年", material: "木", category: "玺印符牌", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs95&v=1" },
+  { id: 17, name: "1928年红军送给李尚发的搪瓷脸盆", spec: "口径35cm，底径18cm", period: "1928年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs96&v=1" },
+  { id: 18, name: "1931年墨书红军标语的木窗板", spec: "纵66.5cm，横36.5cm，厚度2cm", period: "1931年", material: "木", category: "宣传标语", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs97&v=1" },
+  { id: 19, name: "1931年写有红军标语的木窗门板", spec: "纵66.5cm，横36.5cm，厚度2cm", period: "1931年", material: "木", category: "宣传标语", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs98&v=1" },
+  { id: 20, name: "1931年湘赣省军区兵工厂制造的手榴弹", spec: "弹头直径3.8cm，弹头直径1.6cm，通长11.8cm", period: "1931年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs99&v=1" },
+  { id: 21, name: "1931年湘赣省军区兵工厂制造的手榴弹", spec: "弹头直径3.8cm，弹头直径1.6cm，通长11.7cm", period: "1931年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs100&v=1" },
+  { id: 22, name: "1931年中共湘赣省委宣传部长甘露使用过的铁香烟盒", spec: "纵9.2cm，横1.5cm，高8.5cm", period: "1931年", material: "铁，其他无机质", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs101&v=1" },
+  { id: 23, name: "1965年5月湖南省委书记张平化井冈山题写的七言诗轴", spec: "画心纵64cm，横33cm，整体纵190cm，横47.5cm", period: "1965年5月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs102&v=1" },
+  { id: 24, name: "1965年6月解放军空军副司令员曹里怀在井冈山题写的七言诗轴", spec: "画心纵96cm，横52cm，整体纵205cm，横66.5cm", period: "1965年6月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs103&v=1" },
+  { id: 25, name: "1965年7月郭沫若题词「井冈山大井革命群众集体殉难纪念亭」卷轴", spec: "画心纵16.7cm，横158.5cm，整体纵29cm，横206cm", period: "1965年7月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs104&v=1" },
+  { id: 26, name: "1965年7月郭沫若题「井冈山光荣敬老院」卷轴", spec: "画心纵21.3cm，横137.3cm，整体纵32cm，横184cm", period: "1965年7月", material: "纸", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs105&v=1" },
+  { id: 27, name: "1965年7月郭沫若题写「井冈山小学」卷轴", spec: "画心纵22.2cm，横74.5cm，整体纵32.8cm，横126.5cm", period: "1965年7月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs106&v=1" },
+  { id: 28, name: "第二次国内革命战争时期红军战士罗初林使用的搪瓷脸盆", spec: "口径35cm，底径18cm", period: "1927-1937年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs107&v=1" },
+  { id: 29, name: "第二次国内革命战争时期中华苏维埃共和国国家银行伍分铜币", spec: "直径2.6cm，厚度0.2cm", period: "1927-1937年", material: "铜", category: "钱币", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs108&v=1" },
+  { id: 30, name: "第二次国内革命战争时期中华苏维埃共和国国家银行壹分铜币", spec: "直径1.7cm，厚度0.11cm", period: "1927-1937年", material: "铜", category: "钱币", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs109&v=1" },
+  { id: 31, name: "清光绪木刻描金八仙人物花卉图案诗词挂屏", spec: "纵170cm，横184cm，厚3.7cm", period: "清光绪", material: "木", category: "雕塑", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs110&v=1" },
+  { id: 32, name: "清福禄纹烟丝铜盒", spec: "底纵3cm，横6.5cm，高6.4cm", period: "清", material: "铜", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs111&v=1" },
+  { id: 33, name: "清光绪粉彩花鸟纹攒盘", spec: "纵31.5cm，横31.5cm，高10.5cm", period: "清光绪", material: "木，瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs112&v=1" },
+  { id: 34, name: "清光绪青花山水人物纹笔筒", spec: "口径13cm，底径12.6cm，高14cm", period: "清光绪", material: "瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs113&v=1" },
+  { id: 35, name: "清红釉束口三足香炉", spec: "口径14.5cm，高13.2cm，腹围51.5cm", period: "清", material: "瓷", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs114&v=1" },
+  { id: 36, name: "清康熙青花龙纹香炉", spec: "口径22.2cm，底径20.5cm，高20.4cm", period: "清康熙", material: "瓷", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs115&v=1" },
+  { id: 37, name: "清龙尾挂式铜油灯架", spec: "底径13.2cm，通高20.5cm", period: "清", material: "铜", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs116&v=1" },
+  { id: 38, name: "清描金江夏堂神祖牌", spec: "通长23.5cm，通宽42.5cm，通高49.2cm", period: "清", material: "木", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs117&v=1" },
+  { id: 39, name: "清钱纹铜水烟枪", spec: "底长7.3cm，横3.5cm，通高10.5cm", period: "清", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs118&v=1" },
+  { id: 40, name: "清塔形双层铁烛台", spec: "底边8.6cm，通高29.4cm", period: "清", material: "铁，宝玉石", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs119&v=1" },
+  { id: 41, name: "清铜挂饰", spec: "挂筒长7.1cm，口径0.8cm，通长30cm", period: "清", material: "铜，棉麻纤维", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs120&v=1" },
+  { id: 42, name: "清腰形首饰竹盒", spec: "底纵12.5cm，横22.6cm，高11.2cm", period: "清", material: "竹，铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs121&v=1" },
+  { id: 43, name: "清腰形首饰竹盒", spec: "底纵9.8cm，横16.7cm，高8cm", period: "清", material: "竹，铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs122&v=1" },
+  { id: 44, name: "西晋青瓷唾壶", spec: "口径8.3cm，底径9.5cm，高9.8cm", period: "西晋", material: "瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs123&v=1" }
+];
+
+createApp({
+    setup() {
+        const searchQuery = ref('');
+        const selectedPeriod = ref('');
+        const currentRelic = ref(null);
+
+        // 统一图标初始化
+        const initIcons = () => { nextTick(() => { if(window.lucide) lucide.createIcons(); }); };
+
+        // 提取去重后的时间线标签
+        const periods = computed(() => {
+            const all = relicsData.map(item => item.period).filter(Boolean);
+            return [...new Set(all)];
+        });
+
+        // 核心过滤算法
+        const filteredRelics = computed(() => {
+            initIcons(); // 每次过滤异步重塑图标
+            return relicsData.filter(item => {
+                const matchesSearch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+                const matchesPeriod = selectedPeriod.value === '' || item.period === selectedPeriod.value;
+                return matchesSearch && matchesPeriod;
+            });
+        });
+
+        const open3DModal = (item) => { currentRelic.value = item; initIcons(); };
+        const closeModal = () => { currentRelic.value = null; };
+        const resetFilters = () => { searchQuery.value = ''; selectedPeriod.value = ''; };
+
+        onMounted(() => { initIcons(); });
+
+        return {
+            searchQuery,
+            selectedPeriod,
+            periods,
+            filteredRelics,
+            currentRelic,
+            open3DModal,
+            closeModal,
+            resetFilters
+        }
+    }
+}).mount('#app')
+</script>
+
+</body>
+</html>
