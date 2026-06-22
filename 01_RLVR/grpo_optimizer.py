@@ -1,112 +1,74 @@
-"""
-GRPO (Group Relative Policy Optimization)：
-通过组内相对比较来优化策略，
-不依赖绝对评分，只依赖"这个方案比其他方案好多少"。
-"""
+# GRPO 优化器
+# 参考 https://arxiv.org/abs/2506.14245 (Wen et al.)
+# 核心：组内相对比较，不依赖绝对 reward 的 scale
+#
+# 之前一版用 -MSE 算 log_prob，ratio 完全没区分度 → 已改
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
 from config import RLVRConfig
 
 cfg = RLVRConfig()
 
 
 class GRPOOptimizer:
-    """
-    GRPO 策略优化器
+    # 对同一批 state，生成 K 个 candidate action
+    # reward 打分后在组内做 baseline，算 advantage
+    # 用 PPO 的 clipped surrogate 更新
 
-    核心思想：
-    1. 对同一文物残片，Actor 生成 K 个修复方案
-    2. 用 Reward 函数对 K 个方案评分
-    3. 用组内均值做 baseline，计算 advantage
-    4. 用 clipped surrogate objective 更新策略
-    """
-
-    def __init__(self, policy_net: nn.Module, lr: float = None):
+    def __init__(self, policy_net, lr=None):
         self.policy = policy_net
         self.optimizer = torch.optim.Adam(
             policy_net.parameters(),
-            lr=lr or cfg.learning_rate
+            lr=lr if lr is not None else cfg.learning_rate
         )
 
-    def compute_advantage(self, rewards: torch.Tensor) -> torch.Tensor:
-        """
-        计算组内 advantage
+    def compute_advantage(self, rewards):
+        # Group Relative: 组内归一化 → 看每个方案比组均值好多少
+        # rewards: [B, K]
+        baseline = rewards.mean(dim=1, keepdim=True)
+        std = rewards.std(dim=1, keepdim=True) + 1e-8  # 防 0
+        return (rewards - baseline) / std
 
-        Args:
-            rewards: [B, K] 每组的 K 个评分
-
-        Returns:
-            advantages: [B, K] 归一化后的优势值
-        """
-        # 组内均值作为 baseline
-        baseline = rewards.mean(dim=1, keepdim=True)  # [B, 1]
-        std = rewards.std(dim=1, keepdim=True) + 1e-8
-        advantages = (rewards - baseline) / std
-        return advantages
-
-    def update(self,
-               states: torch.Tensor,
-               actions: torch.Tensor,
-               old_log_probs: torch.Tensor,
-               rewards: torch.Tensor) -> dict:
-        """
-        一次 GRPO 更新
-
-        Args:
-            states: [B, D] 状态
-            actions: [B, K, D] 每组 K 个动作
-            old_log_probs: [B, K] 旧策略的 log prob
-            rewards: [B, K] reward 评分
-
-        Returns:
-            loss: 策略损失
-            approx_kl: 近似 KL 散度
-        """
+    def update(self, states, actions, old_log_probs, rewards):
+        # states: [B, state_dim]
+        # actions: [B, K, action_dim] — K 个候选方案
+        # old_log_probs: [B, K] — 采样时记录的 log p
+        # rewards: [B, K]
         B, K, D = actions.shape
-        state_dim = states.shape[-1]
+        S = states.shape[-1]
 
-        # 计算 advantage
         advantages = self.compute_advantage(rewards)  # [B, K]
 
-        # 当前策略的 log prob（简化版：用 -MSE 近似）
-        flat_states = states.unsqueeze(1).expand(-1, K, -1)  # [B, K, state_dim]
-        flat_actions = actions.reshape(-1, D)  # [B*K, action_dim]
-        flat_states_2d = flat_states.reshape(-1, state_dim)  # [B*K, state_dim]
+        # flatten 到 [B*K, ...] 好批量算
+        s_flat = states.unsqueeze(1).expand(-1, K, -1).reshape(-1, S)
+        a_flat = actions.reshape(-1, D)
 
-        new_actions = self.policy(flat_states_2d)
-        # 用负 MSE 作为 log prob 近似
-        new_log_probs = -F.mse_loss(new_actions, flat_actions, reduction='none').mean(dim=1)
-        new_log_probs = new_log_probs.reshape(B, K)
+        # 新策略下重新评估这批 action 的 log prob
+        new_lp = self.policy.evaluate_log_prob(s_flat, a_flat).reshape(B, K)
 
-        # 重要性采样比率
-        ratio = torch.exp(new_log_probs - old_log_probs)
+        ratio = torch.exp(new_lp - old_log_probs)  # 重要：这里终于不是≈1了
 
-        # Clipped surrogate objective
+        # clipped surrogate (PPO style)
+        clip_val = cfg.clip_epsilon
         surr1 = ratio * advantages
-        surr2 = torch.clamp(ratio, 1.0 - cfg.clip_epsilon, 1.0 + cfg.clip_epsilon) * advantages
+        surr2 = torch.clamp(ratio, 1 - clip_val, 1 + clip_val) * advantages
         policy_loss = -torch.min(surr1, surr2).mean()
 
-        # 熵正则
-        entropy = -torch.mean(new_log_probs)
+        # 加一点熵，防止策略过早 collapse
+        ent = -new_lp.mean()
+        loss = policy_loss - cfg.entropy_coef * ent
 
-        # 总损失
-        total_loss = policy_loss - cfg.entropy_coef * entropy
-
-        # 更新
         self.optimizer.zero_grad()
-        total_loss.backward()
+        loss.backward()
         torch.nn.utils.clip_grad_norm_(self.policy.parameters(), 1.0)
         self.optimizer.step()
 
-        # 计算近似 KL
-        approx_kl = ((ratio - 1) - (ratio.log())).mean().item()
+        # 近似 KL: E[ratio - 1 - log(ratio)]，当 ratio≈1 时接近 0
+        approx_kl = (ratio - 1 - ratio.log()).mean().item()
 
         return {
             "policy_loss": policy_loss.item(),
-            "entropy": entropy.item(),
+            "entropy": ent.item(),
             "approx_kl": approx_kl,
-            "total_loss": total_loss.item(),
+            "total_loss": loss.item(),
         }

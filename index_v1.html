@@ -11,198 +11,107 @@
     <!-- 引入苹果同款极简图标库 Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
-
-        :root {
-            --cream: #faf7f2;
-            --paper: #f3efe8;
-            --ink: #2c2416;
-            --ink-light: #6b5e4a;
-            --burgundy: #7a2e1f;
-            --burgundy-light: #a0402a;
-            --brass: #b8956a;
-            --brass-light: #d4b98a;
-            --border: #e5dcd0;
-            --shadow-sm: 0 1px 3px rgba(44,36,22,0.06);
-            --shadow-md: 0 4px 20px rgba(44,36,22,0.10);
-            --shadow-lg: 0 12px 40px rgba(44,36,22,0.15);
-        }
-
+        /* 苹果官网专属的无衬线系统字体 */
         body {
-            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
-            background: var(--cream);
-            color: var(--ink);
         }
-
-        .serif { font-family: 'Noto Serif SC', 'SimSun', serif; }
-
-        /* 纸张纹理叠加 */
-        .paper-texture::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0.035;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-size: 200px 200px;
-        }
-
+        /* 隐藏滚动条但保留滚动功能 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* 滚动渐入 */
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-        }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        /* 精选横滚卡片 */
-        .featured-card {
-            flex-shrink: 0;
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .featured-card:hover { transform: translateY(-4px); }
-
-        /* 网格卡片悬停 */
-        .relic-card {
-            transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        .relic-card:hover {
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-lg);
-        }
-        .relic-card:hover .card-arrow {
-            background: var(--burgundy);
-            color: #fff;
-        }
-        .relic-card:hover .card-img img {
-            transform: scale(1.08);
-        }
-
-        /* modal 动画 */
-        .fade-enter-active { transition: all 0.35s ease-out; }
-        .fade-leave-active { transition: all 0.25s ease-in; }
-        .fade-enter-from, .fade-leave-to { opacity: 0; }
-        .fade-enter-from .modal-shell { transform: scale(0.95) translateY(20px); }
-        .fade-leave-to .modal-shell { transform: scale(0.98); }
     </style>
 </head>
-<body class="paper-texture antialiased min-h-screen">
+<body class="bg-[#f5f5f7] text-[#1d1d1f] antialiased min-h-screen">
 
 <div id="app">
-    <!-- Nav — 极简，只留 logo + 搜索 -->
-    <nav class="fixed top-0 left-0 right-0 z-40 h-14 flex items-center border-b border-[var(--border)]" style="background: rgba(250,247,242,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
-        <div class="max-w-7xl mx-auto px-6 w-full flex items-center justify-between">
-            <div @click="resetFilters" class="flex items-center gap-1.5 cursor-pointer select-none">
-                <span class="serif font-black text-xl tracking-tighter" style="color:var(--burgundy)">红源π</span>
-                <span class="text-[10px] tracking-[0.2em] uppercase" style="color:var(--ink-light)">Digital Heritage</span>
+    <!-- 1. Apple-style 毛玻璃顶部导航栏 -->
+    <nav class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#f5f5f7]/70 border-b border-[#d2d2d7]/30 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
+            <!-- Team Logo -->
+            <div class="flex items-center space-x-2 cursor-pointer" @click="resetFilters">
+                <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">红源π</span>
+                <span class="text-[#86868b] text-xs font-light">|</span>
+                <span class="text-[#1d1d1f] text-sm font-medium tracking-wide">数字革命展厅</span>
             </div>
-            <div class="relative w-56 md:w-72">
-                <input v-model="searchQuery" type="text" placeholder="搜索文物…"
-                    class="w-full text-xs rounded-full pl-9 pr-4 py-2 border focus:outline-none transition-all duration-300"
-                    style="background:var(--paper); border-color:var(--border); color:var(--ink);"
-                    onfocus="this.style.borderColor='var(--burgundy)'; this.style.boxShadow='0 0 0 3px rgba(122,46,31,0.08)'"
-                    onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none'">
-                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5" style="color:var(--ink-light)"></i>
+            
+            <!-- 极简搜索框 -->
+            <div class="relative w-64 md:w-80">
+                <input v-model="searchQuery" type="text" placeholder="搜索革命文物..." 
+                       class="w-full bg-[#e8e8ed]/60 text-xs rounded-full pl-9 pr-4 py-1.5 focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-500/50 transition-all duration-200 text-[#1d1d1f]">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#86868b]"></i>
             </div>
         </div>
     </nav>
 
-    <!-- Hero -->
-    <header class="max-w-6xl mx-auto px-6 pt-28 pb-12 md:pt-36 md:pb-20 text-center">
-        <div class="reveal" id="hero-reveal">
-            <p class="text-[11px] tracking-[0.3em] uppercase mb-4" style="color:var(--burgundy)">井冈山革命博物馆 · 数字孪生档案</p>
-            <h1 class="serif text-4xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight" style="color:var(--ink)">
-                四十四件文物<br>
-                <span class="italic font-semibold" style="color:var(--burgundy)">在指尖重生</span>
-            </h1>
-            <div class="flex items-center justify-center gap-3 mt-8">
-                <span class="w-12 h-px" style="background:var(--border)"></span>
-                <span class="text-xs tracking-wider" style="color:var(--ink-light)">每件文物 · 一个故事 · 无限视角</span>
-                <span class="w-12 h-px" style="background:var(--border)"></span>
-            </div>
-        </div>
+    <!-- 2. Hero 巨幕巨幅留白区 -->
+    <header class="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+        <p class="text-xs font-semibold tracking-widest text-red-600 uppercase mb-3">红源π 数字化时代巨献</p >
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
+            井冈山革命文物 <br>
+            <span class="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 bg-clip-text text-transparent">在 3D 空间里重燃</span>
+        </h1>
+        <p class="text-lg md:text-xl text-[#86868b] mt-6 max-w-2xl mx-auto font-normal leading-relaxed">
+            触摸一件文物，就是触摸一段历史。点击卡片，用 3D 视角近距离感受革命文物的每一处细节。
+        </p >
     </header>
 
-    <!-- 精选横滚 -->
-    <section class="max-w-7xl mx-auto px-6 mb-14 reveal">
-        <p class="text-[10px] tracking-[0.3em] uppercase mb-4" style="color:var(--ink-light)">— 精选馆藏</p>
-        <div class="flex gap-5 overflow-x-auto no-scrollbar pb-2">
-            <div v-for="item in featuredRelics" :key="'f'+item.id" @click="open3DModal(item)"
-                class="featured-card cursor-pointer rounded-2xl overflow-hidden flex-shrink-0"
-                style="width:280px; background:var(--paper); box-shadow:var(--shadow-sm);">
-                <div class="h-[180px] overflow-hidden" style="background:#e8e0d5;">
-                    <img :src="getThumb(item)" :alt="item.name" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-                        loading="lazy" onerror="this.style.display='none'">
-                </div>
-                <div class="p-4">
-                    <span class="text-[10px] tracking-wider px-2 py-0.5 rounded font-medium"
-                        style="background:rgba(122,46,31,0.08); color:var(--burgundy)">{{ item.category }}</span>
-                    <h3 class="text-sm font-bold mt-2 leading-snug line-clamp-2" style="color:var(--ink)">{{ item.name }}</h3>
-                    <p class="text-xs mt-1" style="color:var(--ink-light)">{{ item.period }}</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 筛选器 -->
-    <section class="max-w-7xl mx-auto px-6 mb-10 reveal">
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-            <button @click="selectedPeriod = ''"
-                :style="selectedPeriod === '' ? 'background:var(--ink); color:#fff' : 'background:var(--paper); color:var(--ink)'"
-                class="text-xs font-medium px-4 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap cursor-pointer border"
-                :class="selectedPeriod === '' ? 'border-transparent' : ''"
-                style="border-color:var(--border)">
-                全部
+    <!-- 3. 全局筛选器控制台 (横向滚动胶囊) -->
+    <section class="max-w-7xl mx-auto px-6 mb-12">
+        <div class="flex items-center space-x-3 overflow-x-auto no-scrollbar py-2">
+            <button @click="selectedPeriod = ''" 
+                    :class="selectedPeriod === '' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-[#e8e8ed]' "
+                    class="text-xs font-medium px-4 py-2 rounded-full transition-all duration-200 shadow-sm whitespace-nowrap cursor-pointer">
+                全部时代
             </button>
             <button v-for="p in periods" :key="p" @click="selectedPeriod = p"
-                :style="selectedPeriod === p ? 'background:var(--burgundy); color:#fff; border-color:var(--burgundy)' : 'background:var(--paper); color:var(--ink); border-color:var(--border)'"
-                class="text-xs font-medium px-4 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap cursor-pointer border">
+                    :class="selectedPeriod === p ? 'bg-red-600 text-white' : 'bg-white text-[#1d1d1f] hover:bg-[#e8e8ed]' "
+                    class="text-xs font-medium px-4 py-2 rounded-full transition-all duration-200 shadow-sm whitespace-nowrap cursor-pointer">
                 {{ p }}
             </button>
         </div>
     </section>
 
-    <!-- 主网格 — 大小交错 -->
-    <main class="max-w-7xl mx-auto px-6 pb-32">
-        <div v-if="filteredRelics.length === 0" class="text-center py-28">
-            <p class="serif text-2xl" style="color:var(--ink-light)">无匹配文物</p>
-            <p class="text-xs mt-2" style="color:var(--ink-light)">调整筛选条件试试</p>
+    <!-- 4. Bento Box (便当盒) 卡片式网格流 -->
+    <main class="max-w-7xl mx-auto px-6 pb-24">
+        <!-- 空状态提示 -->
+        <div v-if="filteredRelics.length === 0" class="text-center py-20">
+            <i data-lucide="inbox" class="w-12 h-12 mx-auto text-[#86868b] stroke-1"></i>
+            <p class="text-[#86868b] mt-4 text-sm">未能找到符合条件的文物</p >
         </div>
 
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div v-for="(item, idx) in filteredRelics" :key="item.id" @click="open3DModal(item)"
-                :class="['relic-card cursor-pointer rounded-2xl overflow-hidden reveal',
-                         idx % 7 === 0 ? 'lg:col-span-2 lg:row-span-2' : '',
-                         idx % 7 === 3 ? 'lg:col-span-2' : '']"
-                style="background:var(--paper); box-shadow:var(--shadow-sm);">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 每一个卡片都是一件艺术品 -->
+            <div v-for="item in filteredRelics" :key="item.id" @click="open3DModal(item)"
+                 class="group bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#d2d2d7]/20 overflow-hidden cursor-pointer transform hover:scale-[1.01] transition-all duration-300">
 
-                <!-- 图片区 — 大卡片更高 -->
-                <div :class="idx % 7 === 0 ? 'h-[260px]' : 'h-[160px]'" class="card-img overflow-hidden" style="background:#e8e0d5;">
+                <!-- 缩略图区 -->
+                <div class="h-[160px] bg-[#e8e8ed] overflow-hidden">
                     <img :src="getThumb(item)" :alt="item.name"
-                        class="w-full h-full object-cover transition-transform duration-700"
-                        loading="lazy" onerror="this.style.display='none'">
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                         loading="lazy"
+                         onerror="this.style.display='none'">
                 </div>
 
-                <div class="p-4">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-[10px] tracking-wider px-2 py-0.5 rounded font-medium"
-                            style="background:rgba(122,46,31,0.06); color:var(--burgundy)">{{ item.category }}</span>
-                        <span class="text-[10px] font-mono" style="color:var(--ink-light)">#{{ item.id }}</span>
+                <!-- 卡片文字内容 -->
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md bg-red-50 text-red-600">
+                            {{ item.category || '珍贵文物' }}
+                        </span>
+                        <span class="text-[11px] text-[#86868b] font-mono">ID: jgs{{ item.id }}</span>
                     </div>
-                    <h3 class="text-sm font-bold leading-snug line-clamp-2 min-h-[2.5rem]" style="color:var(--ink)">{{ item.name }}</h3>
-                    <div class="flex items-center justify-between mt-3 pt-3" style="border-top:1px solid var(--border)">
-                        <div>
-                            <p class="text-[11px]" style="color:var(--ink-light)">{{ item.period }}</p>
-                            <p class="text-[11px]" style="color:var(--ink-light)">{{ item.material || '—' }}</p>
+
+                    <h3 class="text-base font-bold text-[#1d1d1f] leading-snug group-hover:text-red-600 transition-colors duration-200 line-clamp-2 min-h-[3rem]">
+                        {{ item.name }}
+                    </h3>
+
+                    <div class="mt-4 border-t border-[#f5f5f7] pt-3 flex justify-between items-end">
+                        <div class="space-y-0.5">
+                            <p class="text-xs text-[#86868b]">年代：<span class="text-[#1d1d1f] font-medium">{{ item.period }}</span></p >
+                            <p class="text-xs text-[#86868b]">材质：<span class="text-[#1d1d1f] font-medium">{{ item.material || '复合材质' }}</span></p >
                         </div>
-                        <div class="card-arrow w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300"
-                            style="background:rgba(122,46,31,0.06)">
-                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5" style="color:var(--burgundy)"></i>
+                        <div class="w-8 h-8 rounded-full bg-[#f5f5f7] group-hover:bg-red-600 flex items-center justify-center transition-all duration-300">
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-[#1d1d1f] group-hover:text-white transition-colors duration-300"></i>
                         </div>
                     </div>
                 </div>
@@ -210,34 +119,36 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t py-12 text-center" style="border-color:var(--border)">
-        <p class="serif text-lg font-bold" style="color:var(--ink)">红源π</p>
-        <p class="text-[11px] mt-1 tracking-wide" style="color:var(--ink-light)">AI 赋能红色文物保护 · 井冈山革命博物馆合作项目</p>
-        <p class="text-[10px] mt-4" style="color:var(--ink-light)">数据源：井冈山革命博物馆 | 3D 引擎：4DAGE</p>
-    </footer>
-
-    <!-- Modal — 暗色电影感 -->
+    <!-- 5. Apple Theater 沉浸式 3D 展厅弹窗 (Modal) -->
     <transition name="fade">
-        <div v-if="currentRelic" class="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-8">
-            <div class="absolute inset-0" style="background:rgba(20,16,10,0.92)" @click="closeModal"></div>
-            <div class="modal-shell w-full max-w-6xl h-[90vh] rounded-2xl overflow-hidden flex flex-col relative z-10" style="background:#1a1814; box-shadow:0 24px 80px rgba(0,0,0,0.6)">
-                <div class="px-5 py-3 flex justify-between items-center" style="border-bottom:1px solid rgba(255,255,255,0.06)">
-                    <div>
-                        <span class="text-[10px] tracking-[0.2em] uppercase" style="color:var(--brass)">3D 预览</span>
-                        <h2 class="text-sm md:text-base font-bold mt-0.5 text-white">{{ currentRelic.name }}</h2>
+        <div v-if="currentRelic" class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4 md:p-10">
+            <!-- 背景暗化遮罩 -->
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="closeModal"></div>
+            
+            <!-- 核心剧幕外壳 -->
+            <div class="bg-[#1d1d1f] w-full max-w-6xl h-full rounded-3xl overflow-hidden shadow-2xl flex flex-col relative z-10 border border-white/10 animate-in fade-in zoom-in-95 duration-300">
+                
+                <!-- 视窗控制头部 -->
+                <div class="px-6 py-4 bg-black/40 border-b border-white/5 flex justify-between items-center">
+                    <div class="text-white">
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-red-500">红源π Spatiotemporal Rendering</span>
+                        <h2 class="text-base md:text-lg font-bold tracking-tight mt-0.5">{{ currentRelic.name }}</h2>
                     </div>
-                    <button @click="closeModal" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer" style="background:rgba(255,255,255,0.06); color:#fff">
+                    <button @click="closeModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-200 cursor-pointer">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
+                
+                <!-- 3D 渲染核心区 -->
                 <div class="flex-1 bg-black relative">
                     <iframe :src="currentRelic.link" class="w-full h-full border-0" allowfullscreen></iframe>
                 </div>
-                <div class="px-5 py-3 flex flex-wrap gap-5 text-[11px]" style="background:rgba(0,0,0,0.5); color:rgba(255,255,255,0.5); border-top:1px solid rgba(255,255,255,0.06)">
-                    <span>级别：<b class="text-white font-medium">{{ currentRelic.level || '未定级' }}</b></span>
-                    <span v-if="currentRelic.spec">规格：<b class="text-white font-medium">{{ currentRelic.spec }}</b></span>
-                    <span>数据源：井冈山革命博物馆</span>
+
+                <!-- 视窗底部数据面板 -->
+                <div class="px-6 py-4 bg-black/40 border-t border-white/5 flex flex-wrap gap-6 text-xs text-[#86868b]">
+                    <div>级别：<span class="text-white font-medium">{{ currentRelic.level || '国家级文物' }}</span></div>
+                    <div v-if="currentRelic.spec">规格：<span class="text-white font-medium">{{ currentRelic.spec }}</span></div>
+                    <div>数据源：井冈山革命博物馆</div>
                 </div>
             </div>
         </div>
@@ -336,13 +247,7 @@ createApp({
             return [...new Set(all)].sort((a, b) => (periodOrder[b] ?? -1) - (periodOrder[a] ?? -1));
         });
 
-        // 精选馆藏（取时间跨度大的代表性文物）
-        const featuredRelics = computed(() => {
-            const ids = [1, 6, 14, 18, 25, 44]; // 抬枪 / 搪瓷杯 / 挂屏 / 标语门板 / 郭题词 / 西晋唾壶
-            return ids.map(id => relicsData.find(r => r.id === id)).filter(Boolean);
-        });
-
-        // 核心过滤 + 排序
+        // 核心过滤 + 排序算法
         const filteredRelics = computed(() => {
             return relicsData
                 .filter(item => {
@@ -358,36 +263,21 @@ createApp({
                 .sort((a, b) => (periodOrder[b.period] ?? -1) - (periodOrder[a.period] ?? -1));
         });
 
-        // 过滤结果变化后重渲染图标
+        // 过滤结果变化后重新渲染图标（不能在 computed 里做）
         watch(filteredRelics, () => {
-            nextTick(() => { if(window.lucide) lucide.createIcons(); initReveal(); });
+            nextTick(() => { if(window.lucide) lucide.createIcons(); });
         });
-
-        // 滚动渐入
-        const initReveal = () => {
-            const els = document.querySelectorAll('.reveal');
-            const obs = new IntersectionObserver((entries) => {
-                entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-            els.forEach(el => obs.observe(el));
-        };
 
         const open3DModal = (item) => { currentRelic.value = item; initIcons(); };
         const closeModal = () => { currentRelic.value = null; };
         const resetFilters = () => { searchQuery.value = ''; selectedPeriod.value = ''; };
 
-        onMounted(() => {
-            initIcons();
-            // hero 首屏立即可见
-            setTimeout(() => { document.getElementById('hero-reveal')?.classList.add('visible'); }, 100);
-            initReveal();
-        });
+        onMounted(() => { initIcons(); });
 
         return {
             searchQuery,
             selectedPeriod,
             periods,
-            featuredRelics,
             filteredRelics,
             currentRelic,
             getThumb,

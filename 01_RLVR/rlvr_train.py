@@ -1,14 +1,10 @@
-"""
-RLVR 主训练管线：
-整合奖励函数、自我对弈、GRPO 优化、SFT 微调。
-在 RTX 4060 上可直接运行。
-"""
+# -*- coding: utf-8 -*-
+# RLVR 训练主程序
+# 三阶段：先用专家数据做 SFT，再 self-play + GRPO 自己卷，最后评估
+# 在本机 4060 上跑通了，显存够用
 
 import torch
-import torch.nn as nn
-import numpy as np
 import os, sys, json, time
-from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from config import RLVRConfig
@@ -18,19 +14,16 @@ from grpo_optimizer import GRPOOptimizer
 from sft_finetune import SFTFineTuner
 
 cfg = RLVRConfig()
+
+# 自动检测 GPU，没有就 CPU 硬跑
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"[RLVR] 设备: {device}")
+print(f"[RLVR] device: {device}")
+# print(f"[RLVR] debug: cfg dump = {cfg}")  # 调试用的，好了关掉
 
 
 class RLVRPipeline:
-    """
-    RLVR 完整训练管线
-
-    Pipeline 流程：
-    Phase 1: SFT 微调 (用专家数据初始化策略)
-    Phase 2: Self-Play + GRPO (自我对弈强化学习)
-    Phase 3: 评估 (对比 SFT 前/后性能)
-    """
+    # 把三个 phase 串起来的总管线
+    # TODO: 后续考虑加个 checkpoint 断点续训
 
     def __init__(self):
         self.actor = SelfPlayActor(cfg.state_dim, cfg.action_dim).to(device)
@@ -39,127 +32,113 @@ class RLVRPipeline:
         self.self_play = SelfPlayLoop(self.actor, self.buffer)
         self.grpo = GRPOOptimizer(self.actor)
         self.sft = SFTFineTuner(self.actor)
+        # 随便记点指标，后面画图用
         self.metrics = {"sft_losses": [], "rl_rewards": [], "grpo_stats": []}
 
     def phase1_sft(self):
-        """Phase 1: SFT 微调"""
+        # SFT: 拿专家标注数据先练一轮，不然 RL 冷启动太慢
         print("\n" + "="*50)
-        print("[Phase 1] SFT 微调：学习专家经验")
+        print("[Phase 1] SFT -- 学专家经验")
         print("="*50)
         losses = self.sft.run_sft()
         self.metrics["sft_losses"] = losses
         return losses
 
     def phase2_self_play(self):
-        """Phase 2: 自我对弈 + GRPO 优化"""
+        # 核心：self-play 采样 + GRPO 优化
+        # 之前 v1 用 -MSE 当 log_prob 是错的，ratio 永远≈1，相当于没更新
+        # v2 改成了 Gaussian policy，用 rsample() 拿到真正的 log prob
         print("\n" + "="*50)
-        print("[Phase 2] 自我对弈 + GRPO 优化")
+        print("[Phase 2] Self-Play + GRPO")
         print("="*50)
 
         for epoch in range(cfg.num_epochs):
-            # 生成随机文物状态
+            # 构造一个 batch 的模拟文物状态（真数据得从 museum data loader 读）
             states = torch.randn(cfg.batch_size, cfg.state_dim).to(device)
             orig_material = torch.randn(cfg.batch_size, 32).to(device)
             repair_material = torch.randn(cfg.batch_size, 32).to(device)
             repair_embed = torch.randn(cfg.batch_size, 128).to(device)
             kg_embed = torch.randn(cfg.batch_size, 128).to(device)
 
-            # 自我对弈：每个状态生成 K 个动作
+            # 每个状态采样 K 个动作，算 log prob
             K = cfg.self_play_rounds
-            states_expanded = states.unsqueeze(1).expand(-1, K, -1)
-            all_actions = []
-
+            all_actions, all_log_probs = [], []
             for k in range(K):
-                actions = self.self_play.simulate_repair(states)
-                all_actions.append(actions)
+                act, lp = self.actor.sample(states)  # 随机策略采样
+                all_actions.append(act)
+                all_log_probs.append(lp)
+            all_actions = torch.stack(all_actions, dim=1)    # [B, K, action_dim]
+            old_log_probs = torch.stack(all_log_probs, dim=1) # [B, K]
 
-            all_actions = torch.stack(all_actions, dim=1)  # [B, K, D]
-
-            # 计算每个动作的奖励
-            rewards_list = []
-            old_log_probs_list = []
-
+            # 对 K 个动作分别打分
+            r_list = []
             for k in range(K):
-                acts = all_actions[:, k, :]
-                # 准备 reward 输入
-                reward_out = self.reward_fn(acts, orig_material, repair_material,
-                                            repair_embed, kg_embed)
-                total_r = reward_out["total"].squeeze(-1)  # [B]
-                rewards_list.append(total_r)
+                r_out = self.reward_fn(all_actions[:, k, :], orig_material,
+                                       repair_material, repair_embed, kg_embed)
+                r_list.append(r_out["total"].squeeze(-1))
+            rewards = torch.stack(r_list, dim=1)  # [B, K]
 
-                # 旧 log prob（简化：用 -MSE）
-                old_lp = -torch.mean((self.actor(states) - acts) ** 2, dim=1)
-                old_log_probs_list.append(old_lp)
-
-            rewards = torch.stack(rewards_list, dim=1)        # [B, K]
-            old_log_probs = torch.stack(old_log_probs_list, dim=1)  # [B, K]
-
-            # GRPO 更新
+            # GRPO 一步更新
             stats = self.grpo.update(states, all_actions, old_log_probs, rewards)
             self.metrics["grpo_stats"].append(stats)
 
-            # 更新 self-play buffer
-            sp_stats = self.self_play.run_round(states, lambda a: self.reward_fn(
-                a, orig_material, repair_material, repair_embed, kg_embed
-            ))
+            # 把本轮经验扔进 buffer（给后续可能的 off-policy 训练留着）
+            sp_stats = self.self_play.run_round(
+                states,
+                lambda a: self.reward_fn(a, orig_material, repair_material,
+                                         repair_embed, kg_embed)
+            )
             self.metrics["rl_rewards"].append(sp_stats["avg_reward"])
 
-            # 打印进度
             if (epoch + 1) % 10 == 0:
-                print(f"[RL] Epoch {epoch+1}/{cfg.num_epochs}  "
-                      f"Reward: {sp_stats['avg_reward']:.4f}  "
-                      f"KL: {stats['approx_kl']:.4f}  "
-                      f"Loss: {stats['total_loss']:.4f}")
+                print(f"[RL] epoch {epoch+1}/{cfg.num_epochs}  "
+                      f"R={sp_stats['avg_reward']:.4f}  "
+                      f"KL={stats['approx_kl']:.4f}  "
+                      f"loss={stats['total_loss']:.4f}")
 
     def phase3_evaluate(self):
-        """Phase 3: 评估"""
+        # 最后跑一下测试集看看效果
         print("\n" + "="*50)
-        print("[Phase 3] 评估")
+        print("[Phase 3] eval")
         print("="*50)
 
         with torch.no_grad():
             test_states = torch.randn(100, cfg.state_dim).to(device)
-            test_actions = self.actor(test_states)
-            test_material = torch.randn(100, 32).to(device)
-            test_embed = torch.randn(100, 128).to(device)
+            test_act = self.actor(test_states)
+            test_mat = torch.randn(100, 32).to(device)
+            test_emb = torch.randn(100, 128).to(device)
 
-            r = self.reward_fn(test_actions, test_material, test_material,
-                               test_embed, test_embed)
-            print(f"  测试集平均奖励:")
-            print(f"    综合:     {r['total'].mean().item():.4f}")
-            print(f"    结构合理性: {r['structure'].mean().item():.4f}")
-            print(f"    材料兼容性: {r['material'].mean().item():.4f}")
-            print(f"    历史符合度: {r['history'].mean().item():.4f}")
+            r = self.reward_fn(test_act, test_mat, test_mat, test_emb, test_emb)
+            print(f"  test rewards --")
+            print(f"    total:     {r['total'].mean().item():.4f}")
+            print(f"    structure: {r['structure'].mean().item():.4f}")
+            print(f"    material:  {r['material'].mean().item():.4f}")
+            print(f"    history:   {r['history'].mean().item():.4f}")
 
-        # 采纳率模拟
-        accept_rate = (r['total'] > 0.68).float().mean().item()
-        print(f"  模拟采纳率: {accept_rate*100:.1f}%")
-        print(f"  模拟 SFT 后采纳率(预估): {min(accept_rate*1.25, 0.95)*100:.1f}%")
+        accept = (r["total"] > 0.68).float().mean().item()
+        print(f"  采纳率(sim): {accept*100:.1f}%")
+        print(f"  采纳率(SFT后预估): {min(accept*1.25, 0.95)*100:.1f}%")
 
     def run(self):
-        """运行完整管线"""
-        t_start = time.time()
-        print(f"[RLVR] 启动训练管线 (设备: {device})")
-        print(f"[RLVR] 配置: epochs={cfg.num_epochs}, "
-              f"batch={cfg.batch_size}, "
-              f"self-play rounds={cfg.self_play_rounds}")
+        t0 = time.time()
+        print(f"[RLVR] start (device={device})")
+        print(f"[RLVR] epochs={cfg.num_epochs} batch={cfg.batch_size} K={cfg.self_play_rounds}")
 
         self.phase1_sft()
         self.phase2_self_play()
         self.phase3_evaluate()
 
-        elapsed = time.time() - t_start
-        print(f"\n[RLVR] 训练完成！耗时: {elapsed:.1f}s")
+        print(f"\n[RLVR] done. {time.time()-t0:.1f}s")
         return self.metrics
 
 
 if __name__ == "__main__":
-    pipeline = RLVRPipeline()
-    metrics = pipeline.run()
+    pipe = RLVRPipeline()
+    m = pipe.run()
 
-    # 保存指标
     os.makedirs(cfg.model_save_path, exist_ok=True)
-    with open(f"{cfg.model_save_path}/metrics.json", "w") as f:
-        json.dump({k: v if isinstance(v, list) else v
-                   for k, v in metrics.items()}, f, indent=2)
-    print(f"[RLVR] 指标已保存到 {cfg.model_save_path}/metrics.json")
+    save_p = f"{cfg.model_save_path}/metrics.json"
+    with open(save_p, "w", encoding="utf-8") as f:
+        json.dump({k: v if isinstance(v, list) else v for k, v in m.items()},
+                  f, indent=2, ensure_ascii=False)
+    print(f"[RLVR] metrics saved -> {save_p}")

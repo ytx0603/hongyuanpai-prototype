@@ -95,14 +95,21 @@ class RAGGenerator:
         template_map = self._content_templates.get(user_type, self._content_templates[UserType.GENERAL])
         template = template_map.get(entity.type, "这是{name}。")
 
-        # 填充模板
+        # 填充模板（v2: 使用安全的 .get 回退，避免 KeyError）
         params = {"name": entity.name, "id": entity.id}
         if entity.attributes:
             params.update(entity.attributes)
 
+        # 使用 defaultdict 风格的回退确保所有模板占位符都有值
         try:
+            content = template.format(**{k: params.get(k, f"[{k}暂无记录]") for k in params})
+            # 二次尝试：捕获模板中需要的但 params 不存在的 key
             content = template.format(**params)
-        except KeyError:
+        except KeyError as e:
+            missed_key = str(e).strip("'")
+            params[missed_key] = f"[{missed_key}暂无记录]"
+            content = template.format(**params)
+        except Exception:
             content = f"{entity.name} — 一件值得我们了解的文物。"
 
         # 添加深度入口

@@ -1,23 +1,16 @@
-"""
-三维度奖励函数：
-1. 结构合理性 — 曲率连续性 + 法向量一致性
-2. 材料兼容性 — 物理化学参数匹配度
-3. 历史逻辑符合度 — 语义相似度 vs 知识图谱
-"""
+# -*- coding: utf-8 -*-
+# 三维度奖励函数：结构合理性 / 材料兼容性 / 历史符合度
+# v2: CompositeReward 可传权重参数，不依赖全局 cfg
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
 from config import RLVRConfig
-
-cfg = RLVRConfig()
 
 
 class StructureReward(nn.Module):
-    """结构合理性评分：评估修复区域的几何连续性"""
-
-    def __init__(self, dim: int = 64):
+    # 结构评分：曲率连续性 + 法向量一致性
+    def __init__(self, dim=64):
         super().__init__()
         self.curvature_net = nn.Sequential(
             nn.Linear(dim, 128), nn.ReLU(),
@@ -30,24 +23,16 @@ class StructureReward(nn.Module):
             nn.Linear(64, 1), nn.Sigmoid()
         )
 
-    def forward(self, repair_features: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            repair_features: [B, D] 修复区域的特征表示
-        Returns:
-            score: [B, 1] 0~1 结构合理性评分
-        """
-        curvature_score = self.curvature_net(repair_features)
-        normal_score = self.normal_net(repair_features)
-        # 加权融合：曲率 0.6 + 法向量 0.4
-        score = 0.6 * curvature_score + 0.4 * normal_score
-        return score
+    def forward(self, feat):
+        # feat: [B, D] → score: [B, 1]
+        c = self.curvature_net(feat)
+        n = self.normal_net(feat)
+        return 0.6 * c + 0.4 * n  # 曲率 6 法向 4
 
 
 class MaterialReward(nn.Module):
-    """材料兼容性评分：评估修复材料的物理化学匹配度"""
-
-    def __init__(self, material_dim: int = 32):
+    # 材料评分：原始材料 vs 修复材料的匹配度
+    def __init__(self, material_dim=32):
         super().__init__()
         self.encoder = nn.Sequential(
             nn.Linear(material_dim, 64), nn.ReLU(),
@@ -55,85 +40,54 @@ class MaterialReward(nn.Module):
         )
         self.scorer = nn.Linear(32, 1)
 
-    def forward(self,
-                original_material: torch.Tensor,
-                repair_material: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            original_material: [B, D] 原始材料属性
-            repair_material: [B, D]   修复材料属性
-        Returns:
-            score: [B, 1] 0~1 材料兼容性评分
-        """
-        orig_feat = self.encoder(original_material)
-        repair_feat = self.encoder(repair_material)
-        # 余弦相似度 + 可学习的残差
-        cos_sim = F.cosine_similarity(orig_feat, repair_feat, dim=1, eps=1e-8).unsqueeze(1)
-        residual = self.scorer(torch.abs(orig_feat - repair_feat))
-        score = torch.sigmoid(cos_sim + residual)
-        return score
+    def forward(self, orig, repair):
+        # orig/repair: [B, D] → score: [B, 1]
+        of = self.encoder(orig)
+        rf = self.encoder(repair)
+        cos = F.cosine_similarity(of, rf, dim=1, eps=1e-8).unsqueeze(1)
+        res = self.scorer(torch.abs(of - rf))
+        return torch.sigmoid(cos + res)
 
 
 class HistoryReward(nn.Module):
-    """历史逻辑符合度评分：评估修复方案是否符合历史记载"""
-
-    def __init__(self, kg_emb_dim: int = 128):
+    # 历史评分：修复方案是否符合 KG 记载的历史背景
+    def __init__(self, kg_emb_dim=128):
         super().__init__()
-        self.semantic_encoder = nn.Sequential(
+        self.sem_enc = nn.Sequential(
             nn.Linear(kg_emb_dim, 256), nn.ReLU(),
             nn.Linear(256, 128), nn.ReLU(),
         )
-        self.temporal_encoder = nn.Sequential(
+        self.tmp_enc = nn.Sequential(
             nn.Linear(kg_emb_dim, 128), nn.ReLU(),
             nn.Linear(128, 64), nn.ReLU(),
         )
-        self.combine = nn.Sequential(
+        self.out = nn.Sequential(
             nn.Linear(192, 64), nn.ReLU(),
             nn.Linear(64, 1), nn.Sigmoid()
         )
 
-    def forward(self,
-                repair_embed: torch.Tensor,
-                kg_embed: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            repair_embed: [B, D] 修复方案的语义编码
-            kg_embed:     [B, D] 知识图谱中对应时期/文物的标准编码
-        Returns:
-            score: [B, 1] 0~1 历史逻辑符合度评分
-        """
-        sem = self.semantic_encoder(repair_embed)
-        temporal = self.temporal_encoder(kg_embed)
-        combined = torch.cat([sem, temporal], dim=1)
-        score = self.combine(combined)
-        return score
+    def forward(self, repair_emb, kg_emb):
+        # repair_emb/kg_emb: [B, D] → score: [B, 1]
+        sem = self.sem_enc(repair_emb)
+        tmp = self.tmp_enc(kg_emb)
+        return self.out(torch.cat([sem, tmp], dim=1))
 
 
 class CompositeReward(nn.Module):
-    """综合奖励：三个维度的加权求和"""
-
-    def __init__(self):
+    # 三个维度的加权和
+    def __init__(self, w_struct=None, w_mat=None, w_hist=None):
         super().__init__()
         self.structure_rwd = StructureReward()
         self.material_rwd = MaterialReward()
         self.history_rwd = HistoryReward()
+        d = RLVRConfig()
+        self.ws = w_struct or d.weight_structure
+        self.wm = w_mat or d.weight_material
+        self.wh = w_hist or d.weight_history
 
-    def forward(self,
-                repair_feat: torch.Tensor,
-                orig_material: torch.Tensor,
-                repair_material: torch.Tensor,
-                repair_embed: torch.Tensor,
-                kg_embed: torch.Tensor) -> dict:
+    def forward(self, repair_feat, orig_material, repair_material, repair_embed, kg_embed):
         s = self.structure_rwd(repair_feat)
         m = self.material_rwd(orig_material, repair_material)
         h = self.history_rwd(repair_embed, kg_embed)
-
-        total = (cfg.weight_structure * s +
-                 cfg.weight_material * m +
-                 cfg.weight_history * h)
-        return {
-            "total": total,           # [B, 1] 综合评分
-            "structure": s,           # [B, 1]
-            "material": m,            # [B, 1]
-            "history": h,             # [B, 1]
-        }
+        total = self.ws * s + self.wm * m + self.wh * h
+        return {"total": total, "structure": s, "material": m, "history": h}

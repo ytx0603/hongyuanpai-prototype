@@ -15,7 +15,7 @@ cfg = NarrativeConfig()
 
 @dataclass
 class KGEntity:
-    """知识图谱实体"""
+    # 图谱节点
     id: str
     name: str
     type: str  # 文物/人物/事件/地点/时期
@@ -23,7 +23,7 @@ class KGEntity:
 
 @dataclass
 class KGRelation:
-    """知识图谱关系"""
+    # 图谱边
     subject_id: str
     predicate: str
     object_id: str
@@ -66,15 +66,13 @@ class KnowledgeGraph:
         """查询某实体的所有关系"""
         return self._subject_index.get(subject_id, [])
 
-    def get_entity_embedding(self, entity_id: str) -> np.ndarray:
-        """
-        获取实体的 Embedding（用于奖励函数）
-
-        模拟实现：用实体 ID 的 hash 生成固定维度的向量。
-        实际部署中应使用 Sentence-BERT 或其他编码器。
-        """
-        np.random.seed(hash(entity_id) % (2**31))
-        return np.random.randn(cfg.kg_embed_dim).astype(np.float32)
+    def get_entity_embedding(self, entity_id):
+        # 用 crc32 生成确定性的 embedding
+        # FIXME: 这只是个占位实现，后续换成 Sentence-BERT
+        import zlib
+        seed = zlib.crc32(entity_id.encode('utf-8')) % (2**31)
+        rng = np.random.RandomState(seed)
+        return rng.randn(cfg.kg_embed_dim).astype(np.float32)
 
     def build_sample_graph(self):
         """构建示例知识图谱"""
