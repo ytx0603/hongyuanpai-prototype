@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>红源π | 井冈山革命博物馆数字展厅</title>
     <!-- 引入 Tailwind CSS v4 体验极致流畅的视觉 -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     <!-- 引入 Vue 3 驱动核心交互 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- 引入苹果同款极简图标库 Lucide -->
@@ -51,7 +51,7 @@
             <span class="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 bg-clip-text text-transparent">在 3D 空间里重燃</span>
         </h1>
         <p class="text-lg md:text-xl text-[#86868b] mt-6 max-w-2xl mx-auto font-normal leading-relaxed">
-            重塑时空记忆。点击任意独家精选卡片，即刻开启苹果级沉浸式 3D 革命文物交互体验。
+            触摸一件文物，就是触摸一段历史。点击卡片，用 3D 视角近距离感受革命文物的每一处细节。
         </p >
     </header>
 
@@ -82,32 +82,37 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- 每一个卡片都是一件艺术品 -->
             <div v-for="item in filteredRelics" :key="item.id" @click="open3DModal(item)"
-                 class="group bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#d2d2d7]/20 overflow-hidden cursor-pointer transform hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between h-[260px] p-6 relative">
-                
-                <!-- 卡片内部流白与标签 -->
-                <div>
-                    <div class="flex items-center justify-between mb-4">
+                 class="group bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#d2d2d7]/20 overflow-hidden cursor-pointer transform hover:scale-[1.01] transition-all duration-300">
+
+                <!-- 缩略图区 -->
+                <div class="h-[160px] bg-[#e8e8ed] overflow-hidden">
+                    <img :src="getThumb(item)" :alt="item.name"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                         loading="lazy"
+                         onerror="this.style.display='none'">
+                </div>
+
+                <!-- 卡片文字内容 -->
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-3">
                         <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md bg-red-50 text-red-600">
                             {{ item.category || '珍贵文物' }}
                         </span>
                         <span class="text-[11px] text-[#86868b] font-mono">ID: jgs{{ item.id }}</span>
                     </div>
-                    
-                    <!-- 标题采用苹果经典的紧凑粗体 -->
-                    <h3 class="text-lg font-bold text-[#1d1d1f] leading-snug group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
+
+                    <h3 class="text-base font-bold text-[#1d1d1f] leading-snug group-hover:text-red-600 transition-colors duration-200 line-clamp-2 min-h-[3rem]">
                         {{ item.name }}
                     </h3>
-                </div>
 
-                <!-- 卡片底部元数据 -->
-                <div class="mt-4 border-t border-[#f5f5f7] pt-4 flex justify-between items-end">
-                    <div class="space-y-0.5">
-                        <p class="text-xs text-[#86868b]">年代：<span class="text-[#1d1d1f] font-medium">{{ item.period }}</span></p >
-                        <p class="text-xs text-[#86868b]">材质：<span class="text-[#1d1d1f] font-medium">{{ item.material || '复合材质' }}</span></p >
-                    </div>
-                    <!-- 交互箭头动效 -->
-                    <div class="w-8 h-8 rounded-full bg-[#f5f5f7] group-hover:bg-red-600 flex items-center justify-center transition-all duration-300">
-                        <i data-lucide="arrow-up-right" class="w-4 h-4 text-[#1d1d1f] group-hover:text-white transition-colors duration-300"></i>
+                    <div class="mt-4 border-t border-[#f5f5f7] pt-3 flex justify-between items-end">
+                        <div class="space-y-0.5">
+                            <p class="text-xs text-[#86868b]">年代：<span class="text-[#1d1d1f] font-medium">{{ item.period }}</span></p >
+                            <p class="text-xs text-[#86868b]">材质：<span class="text-[#1d1d1f] font-medium">{{ item.material || '复合材质' }}</span></p >
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-[#f5f5f7] group-hover:bg-red-600 flex items-center justify-center transition-all duration-300">
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-[#1d1d1f] group-hover:text-white transition-colors duration-300"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,7 +156,27 @@
 </div>
 
 <script>
-const { createApp, ref, computed, onMounted, nextTick } = Vue;
+const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
+
+// 历史时期排序映射（值越大越新）
+const periodOrder = {
+  "西晋": 0,
+  "明代": 100,
+  "清康熙": 200,
+  "清": 250,
+  "清光绪": 300,
+  "民国": 400,
+  "20世纪20年代初期": 450,
+  "1926年": 460,
+  "1927-1937年": 470,
+  "1928年": 480,
+  "1930年代初期": 490,
+  "1931年": 500,
+  "1949年": 600,
+  "1965年5月": 700,
+  "1965年6月": 710,
+  "1965年7月": 720
+};
 
 // 从 jgsxiaowenwu.xlsx 自动生成的 44 件文物数据
 const relicsData = [
@@ -207,23 +232,40 @@ createApp({
         const selectedPeriod = ref('');
         const currentRelic = ref(null);
 
+        // 从 3D 模型链接中提取缩略图 URL
+        const getThumb = (item) => {
+            const m = item.link.match(/m=([^&]+)/);
+            return m ? `https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/${m[1]}.jpg` : '';
+        };
+
         // 统一图标初始化
         const initIcons = () => { nextTick(() => { if(window.lucide) lucide.createIcons(); }); };
 
-        // 提取去重后的时间线标签
+        // 提取去重后的时间线标签（从后往前）
         const periods = computed(() => {
             const all = relicsData.map(item => item.period).filter(Boolean);
-            return [...new Set(all)];
+            return [...new Set(all)].sort((a, b) => (periodOrder[b] ?? -1) - (periodOrder[a] ?? -1));
         });
 
-        // 核心过滤算法
+        // 核心过滤 + 排序算法
         const filteredRelics = computed(() => {
-            initIcons(); // 每次过滤异步重塑图标
-            return relicsData.filter(item => {
-                const matchesSearch = item.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-                const matchesPeriod = selectedPeriod.value === '' || item.period === selectedPeriod.value;
-                return matchesSearch && matchesPeriod;
-            });
+            return relicsData
+                .filter(item => {
+                    const q = searchQuery.value.toLowerCase();
+                    const matchesSearch = q === '' ||
+                        item.name.toLowerCase().includes(q) ||
+                        (item.material || '').toLowerCase().includes(q) ||
+                        (item.category || '').toLowerCase().includes(q) ||
+                        (item.period || '').toLowerCase().includes(q);
+                    const matchesPeriod = selectedPeriod.value === '' || item.period === selectedPeriod.value;
+                    return matchesSearch && matchesPeriod;
+                })
+                .sort((a, b) => (periodOrder[b.period] ?? -1) - (periodOrder[a.period] ?? -1));
+        });
+
+        // 过滤结果变化后重新渲染图标（不能在 computed 里做）
+        watch(filteredRelics, () => {
+            nextTick(() => { if(window.lucide) lucide.createIcons(); });
         });
 
         const open3DModal = (item) => { currentRelic.value = item; initIcons(); };
@@ -238,6 +280,7 @@ createApp({
             periods,
             filteredRelics,
             currentRelic,
+            getThumb,
             open3DModal,
             closeModal,
             resetFilters
