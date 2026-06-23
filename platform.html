@@ -169,8 +169,8 @@
         <!-- Header -->
         <header class="absolute top-0 left-0 right-0 flex justify-between items-center px-6 md:px-10 py-6 z-50 text-sm">
           <div class="flex items-center gap-8">
-            <!-- Triangle Logo -->
-            <div class="w-5 h-5 bg-white" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+            <!-- Project Logo -->
+            <img src="images/logo.png" alt="红源π" class="w-7 h-7 object-contain">
             <nav class="hidden md:flex gap-6 text-gray-400 font-medium tracking-wide">
               <a href="index_v3.html?skipHero=1" class="hover:text-white transition">Digital Twin</a>
               <a @click.prevent="enterSite('hongyuanpi')" href="#" class="hover:text-white transition">Hongyuanπ</a>
@@ -204,9 +204,9 @@
               </div>
             </div>
 
-            <!-- Center Glowing Triangle -->
+            <!-- Center Logo -->
             <div class="flex justify-center items-center relative z-10 h-full order-1 md:order-2 glowing-triangle-wrapper">
-               <div class="glowing-triangle md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 mt-20 md:mt-0"></div>
+               <img src="images/logo.png" alt="红源π" class="md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 mt-20 md:mt-0" style="width:clamp(160px,20vw,280px);filter:drop-shadow(0 0 20px rgba(255,255,255,0.3)) drop-shadow(0 0 60px rgba(255,255,255,0.15));transition:filter 0.5s ease">
             </div>
 
             <!-- Right Text -->
@@ -220,9 +220,6 @@
 
         <!-- Bottom Logos -->
         <div class="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-8 md:gap-16 opacity-60 px-6 flex-wrap pb-6 md:pb-0">
-           <div class="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tight">
-             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 22h20L12 2z"/></svg> 4DAGE
-           </div>
            <div class="font-bold text-lg md:text-xl tracking-tighter">JINGGANGSHAN MUSEUM</div>
            <div class="font-serif italic text-lg md:text-xl tracking-tight">Red Source Pi</div>
         </div>
@@ -286,7 +283,7 @@
         <section id="partners" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #05050f 50%, #000 100%)">
           <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 04</p>
           <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">合作单位</h2>
-          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">井冈山革命博物馆 · 4DAGE · 江西师范大学 · 瑞金叶坪</p>
+          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">井冈山革命博物馆 · 江西师范大学 · 瑞金叶坪</p>
           <a href="partners.html" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
             View Partners
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
