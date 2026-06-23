@@ -6,7 +6,8 @@
 <title>红源π — 发展历程</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-body{margin:0;background:#000;color:#ededed;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+body{margin:0;background:#000;color:#ededed;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+@media(max-width:640px){h1{font-size:clamp(32px,8vw,48px)!important}.body-text{font-size:15px!important}.year{font-size:56px!important}}
 a{text-decoration:none}
 nav{position:sticky;top:0;z-index:50;background:rgba(0,0,0,0.85);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.08)}
 .nav-inner{max-width:1280px;margin:0 auto;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
@@ -23,7 +24,7 @@ footer{border-top:1px solid rgba(255,255,255,0.08);text-align:center;padding:40p
 </head>
 <body>
 <nav><div class="nav-inner">
-<a href="platform.html" style="display:flex;align-items:baseline;gap:12px"><span style="font-weight:700;font-size:20px;color:#ededed">红源π</span><span style="font-size:10px;color:#737373;letter-spacing:0.1em;background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px">DIGITAL HERITAGE</span></a>
+<a href="platform.html" style="display:flex;align-items:center;gap:10px"><img src="images/logo-small.png" alt="" style="width:24px;height:24px"><span style="font-weight:700;font-size:20px;color:#ededed">红源π</span><span style="font-size:10px;color:#737373;letter-spacing:0.1em;background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px">DIGITAL HERITAGE</span></a>
 <div style="display:flex;gap:24px;font-size:14px;font-weight:500">
 <a href="index_v3.html?skipHero=1" style="color:#a3a3a3">Digital Twin</a>
 <a href="hongyuanpi.html" style="color:#a3a3a3">Hongyuanπ</a>
@@ -40,5 +41,14 @@ footer{border-top:1px solid rgba(255,255,255,0.08);text-align:center;padding:40p
 <div><p class="year">2024</p><p class="milestone-title">技术突破 · 实地应用</p><p class="body-text">三大核心技术体系全面成型：RLVR 强化学习文物修复系统、3D-CNN 智能病害监测网络、多模态叙事引擎。4 月参加第二届革命文物保护利用智汇论坛，团队成员提出革命文物保护利用倡议。9 月在井冈山革命博物馆运用虚拟仿真技术推动革命文物活化。瑞金叶坪革命旧址群数字化展陈项目正式落地，标志着从实验室研究到实地应用的突破性跨越。</p></div>
 <div><p class="year">2025</p><p class="milestone-title">成效显现 · 瑞金落地</p><p class="body-text">44 件馆藏文物完成高精度三维数字化建档，入选"全国革命文物保护十佳案例"。3 月在瑞金中央革命根据地纪念馆进行不可移动文物数字采集赋能。累计培养 500 余名掌握文物数字化技术的复合型人才，毕业生参与国家级文物活化项目率达 35%。红色文创产品年收益突破 9 万元，全额反哺革命旧址保护。</p></div>
 <div><p class="year">2026</p><p class="milestone-title">平台上线</p><p class="body-text">"红源π"数字孪生档案平台正式发布，44 件文物实现在线 3D 交互浏览。云端文物修复实验室向全国 10 所高校开放共享。"1π 1环 1N"公益模式启动全国推广计划，致力于让更多革命文物在数字世界获得永生。</p></div>
+
+<!-- 未来展望 -->
+<div style="margin-top:40px;padding:48px 40px;border-radius:12px;background:rgba(0,112,243,0.06);border:1px solid rgba(0,112,243,0.15)">
+<p style="color:#0070F3;font-size:12px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 16px">Outlook</p>
+<p class="milestone-title" style="color:#ededed">未来展望</p>
+<p class="body-text" style="margin-bottom:16px">短期目标是将数字化保护方案推广至延安、遵义、西柏坡等全国 10 个重点革命老区，建立统一的革命文物数字档案标准，让分散在全国各地的红色文物都能获得同等的数字化保护机会。</p>
+<p class="body-text" style="margin-bottom:16px">中期计划是与更多高校、科研机构共建"革命文物 AI 开放实验室"，将 RLVR 修复系统和 3D-CNN 监测网络开放为公共服务工具，降低基层文保单位的技术使用门槛，让一线文保员无需编程基础也能借助 AI 完成病害识别与修复方案生成。</p>
+<p class="body-text">长远愿景是打造一个覆盖全国的红色文物数字孪生网络——每一件革命文物、每一处革命旧址，都在数字世界拥有一份"永生档案"。让当年的热血与选择，不被时间磨损，不被后人遗忘。</p>
+</div>
 </div></div>
 <footer><p>© 2026 红源π</p></footer></body></html>

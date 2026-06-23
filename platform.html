@@ -33,6 +33,7 @@
     }
     html {
       scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
     }
     body {
       margin: 0;
@@ -41,6 +42,22 @@
     }
     [v-cloak] {
       display: none !important;
+    }
+
+    /* ===== 移动端适配 ===== */
+    @media (max-width: 640px) {
+      .hero-heading {
+        font-size: 2.5rem !important;
+        line-height: 1.08 !important;
+      }
+      .hero-right-text {
+        font-size: 11px !important;
+        letter-spacing: 0.1em !important;
+        padding: 0 1rem;
+      }
+      .section-year-waterfall {
+        font-size: clamp(80px, 18vw, 120px) !important;
+      }
     }
 
     /* Transition classes */
@@ -169,8 +186,8 @@
         <!-- Header -->
         <header class="absolute top-0 left-0 right-0 flex justify-between items-center px-6 md:px-10 py-6 z-50 text-sm">
           <div class="flex items-center gap-8">
-            <!-- Triangle Logo -->
-            <div class="w-5 h-5 bg-white" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
+            <!-- Logo -->
+            <img src="images/logo-small.png" alt="红源π" class="w-6 h-6 object-contain">
             <nav class="hidden md:flex gap-6 text-gray-400 font-medium tracking-wide">
               <a href="index_v3.html?skipHero=1" class="hover:text-white transition">Digital Twin</a>
               <a @click.prevent="enterSite('hongyuanpi')" href="#" class="hover:text-white transition">Hongyuanπ</a>
@@ -190,16 +207,16 @@
             
             <!-- Left Text & Buttons -->
             <div class="flex flex-col items-start z-20 order-2 md:order-1 mt-10 md:mt-0">
-              <h1 class="text-5xl sm:text-6xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tighter mb-8">
+              <h1 class="hero-heading text-5xl sm:text-6xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tighter mb-6 sm:mb-8">
                 Digital<br>Heritage<br>Archive
               </h1>
-              <div class="flex flex-wrap gap-4">
-                <button @click="enterSite" class="bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px] flex items-center gap-2">
+              <div class="flex flex-wrap gap-3 sm:gap-4">
+                <button @click="enterSite" class="bg-white text-black hover:bg-gray-200 px-5 sm:px-6 py-3 rounded-full font-semibold transition text-[14px] sm:text-[15px] flex items-center gap-2">
                   Explore Now
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                 </button>
-                <button class="bg-transparent border border-white/20 hover:border-white/40 text-white px-6 py-3 rounded-full font-semibold transition text-[15px]">
-                  Talk to Sales
+                <button class="hidden sm:inline-flex bg-transparent border border-white/20 hover:border-white/40 text-white px-6 py-3 rounded-full font-semibold transition text-[15px]">
+                  了解更多
                 </button>
               </div>
             </div>
@@ -210,7 +227,7 @@
             </div>
 
             <!-- Right Text -->
-            <div class="flex flex-col md:items-end z-20 text-left md:text-right space-y-3 font-mono text-xs md:text-sm tracking-[0.15em] text-gray-400 order-3 mt-16 md:mt-0">
+            <div class="hero-right-text flex flex-row md:flex-col md:items-end z-20 text-left md:text-right gap-4 md:gap-0 md:space-y-3 font-mono text-xs md:text-sm tracking-[0.15em] text-gray-400 order-3 mt-8 md:mt-0 px-2 md:px-0">
               <p>FOR CULTURAL HERITAGE</p>
               <p>TO PRESERVE RED RELICS</p>
               <p>PRESENTED IN 3D</p>
@@ -219,9 +236,9 @@
         </div>
 
         <!-- Bottom Logos -->
-        <div class="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-8 md:gap-16 opacity-60 px-6 flex-wrap pb-6 md:pb-0">
-           <div class="font-bold text-lg md:text-xl tracking-tighter">JINGGANGSHAN MUSEUM</div>
-           <div class="font-serif italic text-lg md:text-xl tracking-tight">Red Source Pi</div>
+        <div class="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-4 sm:gap-8 md:gap-16 opacity-50 sm:opacity-60 px-4 sm:px-6 flex-wrap pb-4 sm:pb-6 md:pb-0">
+           <div class="font-bold text-sm sm:text-lg md:text-xl tracking-tighter">JINGGANGSHAN MUSEUM</div>
+           <div class="font-serif italic text-sm sm:text-lg md:text-xl tracking-tight">Red Source Pi</div>
         </div>
       </div>
     </transition>
@@ -233,7 +250,8 @@
         <!-- Nav -->
         <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-v-border">
           <div class="max-w-[1280px] mx-auto h-[64px] flex items-center justify-between px-6">
-            <a href="platform.html" class="flex items-baseline gap-3 no-underline">
+            <a href="platform.html" class="flex items-center gap-2.5 no-underline">
+              <img src="images/logo-small.png" alt="" style="width:22px;height:22px">
               <span class="font-bold text-v-gray-text-1 text-xl tracking-tight">红源π</span>
               <span class="relic-tag uppercase !tracking-[0.1em] text-[10px]">DIGITAL HERITAGE</span>
             </a>
@@ -247,47 +265,103 @@
         </nav>
 
         <!-- ====== Section 1: Digital Twin ====== -->
-        <section id="digital-twin" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #0a0a0f 50%, #000 100%)">
+        <section id="digital-twin" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24 overflow-hidden" style="background:#000">
+          <div class="absolute inset-0 grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 opacity-35" style="gap:0">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs71.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs82.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs85.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs86.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs89.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs91.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs93.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs94.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs97.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs99.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs101.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs104.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs107.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs110.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs112.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs115.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs117.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs119.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs121.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs123.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs81.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs83.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs84.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs87.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs88.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs90.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs92.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs95.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs96.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs98.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs100.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs102.jpg" class="w-full aspect-square object-cover" loading="lazy">
+          </div>
+          <div class="absolute inset-0" style="background:rgba(0,0,0,0.5)"></div>
+          <div class="relative z-10">
           <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 01</p>
-          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">数字孪生档案</h2>
-          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">44 件井冈山革命文物 · 高精度三维数字化记录</p>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(36px,6vw,72px)">数字孪生档案</h2>
+          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">井冈山革命文物 · 高精度三维数字化记录</p>
           <a href="index_v3.html?skipHero=1" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
             Explore Relics
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
+          </div>
         </section>
 
         <!-- ====== Section 2: Hongyuanπ ====== -->
-        <section id="hongyuanpi" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #050510 50%, #000 100%)">
+        <section id="hongyuanpi" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:url('images/team.jpg') center/cover no-repeat">
+          <div class="absolute inset-0" style="background:rgba(0,0,0,0.75)"></div>
+          <div class="relative z-10">
           <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 02</p>
-          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">红源π</h2>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(36px,6vw,72px)">红源π</h2>
           <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">基于数智融合的革命文物活化研究新范式</p>
           <a href="hongyuanpi.html" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
             Learn More
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
+          </div>
         </section>
 
         <!-- ====== Section 3: Timeline ====== -->
-        <section id="timeline" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #0a0a10 50%, #000 100%)">
+        <section id="timeline" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24 overflow-hidden" style="background:#000">
+          <!-- 年份瀑布背景 -->
+          <div class="section-year-waterfall absolute inset-0 flex flex-col justify-between opacity-[0.06]" style="padding:5vh 0;font-size:clamp(140px,20vw,300px);font-weight:800;letter-spacing:-0.08em;line-height:0.75;color:#fff;pointer-events:none;user-select:none">
+            <div style="text-align:center;margin-left:-12%">2017</div>
+            <div style="text-align:center;margin-right:-10%">2019</div>
+            <div style="text-align:center;margin-left:-6%">2021</div>
+            <div style="text-align:center;margin-right:-6%">2023</div>
+            <div style="text-align:center;margin-left:-12%">2024</div>
+            <div style="text-align:center;margin-right:-10%">2025</div>
+            <div style="text-align:center;margin-left:-8%">2026</div>
+          </div>
+          <div class="absolute inset-0" style="background:linear-gradient(180deg, #000 0%, transparent 20%, transparent 80%, #000 100%)"></div>
+          <div class="relative z-10">
           <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 03</p>
-          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">发展历程</h2>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(36px,6vw,72px)">发展历程</h2>
           <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">从井冈山到数字未来 · 我们的每一步</p>
           <a href="timeline.html" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
             View Timeline
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
+          </div>
         </section>
 
         <!-- ====== Section 4: Partners ====== -->
-        <section id="partners" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #05050f 50%, #000 100%)">
+        <section id="partners" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:url('images/partners.jpg') center/cover no-repeat">
+          <div class="absolute inset-0" style="background:rgba(0,0,0,0.7)"></div>
+          <div class="relative z-10">
           <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 04</p>
-          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">合作单位</h2>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(36px,6vw,72px)">合作单位</h2>
           <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">井冈山革命博物馆 · 江西师范大学 · 瑞金叶坪</p>
           <a href="partners.html" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
             View Partners
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
           </a>
+          </div>
         </section>
 
         <!-- Footer -->
