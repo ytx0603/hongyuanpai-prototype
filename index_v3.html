@@ -39,6 +39,7 @@
     }
     @media (max-width: 640px) {
       .hero-heading { font-size: 2.5rem !important; line-height: 1.08 !important; }
+      .hero-right-text { font-size: 11px !important; letter-spacing: 0.1em !important; }
     }
     [v-cloak] {
       display: none !important;
@@ -191,16 +192,16 @@
             
             <!-- Left Text & Buttons -->
             <div class="flex flex-col items-start z-20 order-2 md:order-1 mt-10 md:mt-0">
-              <h1 class="text-5xl sm:text-6xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tighter mb-8">
+              <h1 class="hero-heading text-5xl sm:text-6xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tighter mb-6 sm:mb-8">
                 Digital<br>Heritage<br>Archive
               </h1>
-              <div class="flex flex-wrap gap-4">
-                <button @click="enterSite" class="bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px] flex items-center gap-2">
+              <div class="flex flex-wrap gap-3 sm:gap-4">
+                <button @click="enterSite" class="bg-white text-black hover:bg-gray-200 px-5 sm:px-6 py-3 rounded-full font-semibold transition text-[14px] sm:text-[15px] flex items-center gap-2">
                   Explore Now
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                 </button>
-                <button class="bg-transparent border border-white/20 hover:border-white/40 text-white px-6 py-3 rounded-full font-semibold transition text-[15px]">
-                  Talk to Sales
+                <button class="hidden sm:inline-flex bg-transparent border border-white/20 hover:border-white/40 text-white px-6 py-3 rounded-full font-semibold transition text-[15px]">
+                  了解更多
                 </button>
               </div>
             </div>
@@ -211,7 +212,7 @@
             </div>
 
             <!-- Right Text -->
-            <div class="flex flex-col md:items-end z-20 text-left md:text-right space-y-3 font-mono text-xs md:text-sm tracking-[0.15em] text-gray-400 order-3 mt-16 md:mt-0">
+            <div class="hero-right-text flex flex-row md:flex-col md:items-end z-20 text-left md:text-right gap-4 md:gap-0 md:space-y-3 font-mono text-xs md:text-sm tracking-[0.15em] text-gray-400 order-3 mt-8 md:mt-0 px-2 md:px-0">
               <p>FOR CULTURAL HERITAGE</p>
               <p>TO PRESERVE RED RELICS</p>
               <p>PRESENTED IN 3D</p>
@@ -220,9 +221,9 @@
         </div>
 
         <!-- Bottom Logos -->
-        <div class="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-8 md:gap-16 opacity-60 px-6 flex-wrap pb-6 md:pb-0">
-           <div class="font-bold text-lg md:text-xl tracking-tighter">JINGGANGSHAN MUSEUM</div>
-           <div class="font-serif italic text-lg md:text-xl tracking-tight">Red Source Pi</div>
+        <div class="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-4 sm:gap-8 md:gap-16 opacity-50 sm:opacity-60 px-4 sm:px-6 flex-wrap pb-4 sm:pb-6 md:pb-0">
+           <div class="font-bold text-sm sm:text-lg md:text-xl tracking-tighter">JINGGANGSHAN MUSEUM</div>
+           <div class="font-serif italic text-sm sm:text-lg md:text-xl tracking-tight">Red Source Pi</div>
         </div>
       </div>
     </transition>
@@ -240,7 +241,7 @@
               <span class="relic-tag uppercase !tracking-[0.1em] text-[10px] hidden sm:inline">DIGITAL HERITAGE</span>
             </a>
             <div class="flex items-center gap-4">
-              <input type="search" placeholder="Search relics..." class="h-9 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm focus:border-v-blue focus:bg-black transition w-[200px] md:w-[240px] outline-none" />
+              <input type="search" placeholder="搜索..." class="h-9 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm focus:border-v-blue focus:bg-black transition w-[120px] sm:w-[200px] md:w-[240px] outline-none" />
             </div>
           </div>
         </nav>
