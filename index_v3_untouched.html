@@ -177,6 +177,7 @@
           </div>
           <div class="flex items-center gap-4 font-medium">
             <button class="text-gray-400 hover:text-white transition px-3 py-1 hidden sm:block">Docs</button>
+            <button class="bg-white/10 hover:bg-white/20 text-white px-4 py-1.5 rounded-md transition hidden sm:block">Log In</button>
             <button @click="enterSite" class="bg-white text-black hover:bg-gray-200 px-4 py-1.5 rounded-md transition">Enter System</button>
           </div>
         </header>
@@ -192,7 +193,7 @@
               </h1>
               <div class="flex flex-wrap gap-4">
                 <button @click="enterSite" class="bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px] flex items-center gap-2">
-                  Explore Now
+                  Deploy Now
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                 </button>
                 <button class="bg-transparent border border-white/20 hover:border-white/40 text-white px-6 py-3 rounded-full font-semibold transition text-[15px]">
@@ -210,7 +211,7 @@
             <div class="flex flex-col md:items-end z-20 text-left md:text-right space-y-3 font-mono text-xs md:text-sm tracking-[0.15em] text-gray-400 order-3 mt-16 md:mt-0">
               <p>FOR CULTURAL HERITAGE</p>
               <p>TO PRESERVE RED RELICS</p>
-              <p>PRESENTED IN 3D</p>
+              <p>AUTOMATED BY AI & 3D</p>
             </div>
           </div>
         </div>
@@ -221,6 +222,8 @@
              <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2L2 22h20L12 2z"/></svg> 4DAGE
            </div>
            <div class="font-bold text-lg md:text-xl tracking-tighter">JINGGANGSHAN MUSEUM</div>
+           <div class="font-semibold text-base md:text-lg tracking-wider">Vue.js</div>
+           <div class="font-bold text-base md:text-lg flex items-center gap-1">OpenAI</div>
            <div class="font-serif italic text-lg md:text-xl tracking-tight">Red Source Pi</div>
         </div>
       </div>
@@ -233,10 +236,10 @@
         <!-- Nav -->
         <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-v-border">
           <div class="max-w-[1280px] mx-auto h-[64px] flex items-center justify-between px-6">
-            <a href="platform.html" class="flex items-baseline gap-3 no-underline">
+            <div class="flex items-baseline gap-3">
               <span class="font-bold text-v-gray-text-1 text-xl tracking-tight">红源π</span>
               <span class="relic-tag uppercase !tracking-[0.1em] text-[10px]">DIGITAL HERITAGE</span>
-            </a>
+            </div>
             <div class="flex items-center gap-4">
               <input type="search" placeholder="Search relics..." class="h-9 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm focus:border-v-blue focus:bg-black transition w-[200px] md:w-[240px] outline-none" />
             </div>
@@ -247,8 +250,8 @@
           
           <!-- Hero section for Main Content -->
           <header class="mb-16">
-            <p class="text-white uppercase text-xs font-medium tracking-[0.18em] mb-4">JINGGANGSHAN REVOLUTIONARY MUSEUM</p>
-            <h2 class="font-bold text-v-gray-text-1 leading-tight tracking-[-0.045em] mb-4 text-4xl md:text-5xl">44 件革命文物 / <span class="text-v-blue">数字孪生档案</span></h2>
+            <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">JINGGANGSHAN REVOLUTIONARY MUSEUM</p>
+            <h2 class="font-bold text-v-gray-text-1 leading-tight tracking-[-0.045em] mb-4 text-4xl md:text-5xl">44 件革命文物 / 数字孪生档案</h2>
             <p class="text-v-gray-text-2 text-lg md:text-xl max-w-3xl mt-4">利用高精度 AI 三维数字化技术，永久保存井冈山革命博物馆精选革命文物的数字档案，实现革命精神的数字化永续传承。</p>
           </header>
 
@@ -266,7 +269,7 @@
                 @click="openRelicModal(relic)"
               >
                 <div class="aspect-square bg-black rounded-md mb-4 overflow-hidden relative border border-white/5">
-                  <img :src="getThumb(relic)" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
+                  <img :src="relic.thumbnail" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
                 </div>
                 <div class="flex items-start gap-2 mb-2">
                    <span class="relic-tag mt-0.5">{{ relic.period }}</span>
@@ -306,7 +309,7 @@
                 @click="openRelicModal(relic)"
               >
                 <div class="aspect-[4/3] bg-black rounded-md mb-4 overflow-hidden border border-white/5">
-                  <img :src="getThumb(relic)" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
+                  <img :src="relic.thumbnail" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
                 </div>
                 <div class="flex items-center justify-between gap-2 mb-2">
                    <span class="relic-tag">{{ relic.category }}</span>
@@ -357,69 +360,32 @@
   <script>
     const { createApp, ref, computed } = Vue;
 
-    // ====== 44 true relics (from jgsxiaowenwu.xlsx) ======
-    const periodOrder = {
-      "西晋": 0, "明代": 100, "清康熙": 200, "清": 250, "清光绪": 300,
-      "民国": 400, "20世纪20年代初期": 450, "1926年": 460, "1927-1937年": 470,
-      "1928年": 480, "1930年代初期": 490, "1931年": 500, "1949年": 600,
-      "1965年5月": 700, "1965年6月": 710, "1965年7月": 720
-    };
+    // Mock Data Generation
+    const relicsDataArray = [];
+    const categories = ["器物类", "生活用品", "武器类", "办公用品", "名人遗物", "玺印符牌", "服装标识", "雕塑", "宣传标语", "题词手稿", "钱币", "宗教祭祀", "其他"];
+    const periods = ["西晋", "明代", "清", "民国", "1920s", "1930s", "1949", "1965"];
+    
+    for (let i = 71; i <= 114; i++) {
+        const catIndex = Math.floor(Math.random() * categories.length);
+        const periodIndex = Math.floor(Math.random() * periods.length);
+        const relicId = `jgs${i}`;
+        
+        relicsDataArray.push({
+            id: relicId,
+            name: `${periods[periodIndex]}${categories[catIndex]}样例文物 [${i}]`,
+            spec: `这是一件代表 ${periods[periodIndex]} 时期的 ${categories[catIndex]}，用于展示红源π数字化保护成果。这里是文物的详细描述。`,
+            period: periods[periodIndex],
+            material: ["木质", "陶瓷", "金属", "布料", "纸张"][Math.floor(Math.random() * 5)],
+            category: categories[catIndex],
+            level: ["一级", "二级", "三级", "一般"][Math.floor(Math.random() * 4)],
+            link: `https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=${relicId}&v=1`,
+            thumbnail: `https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/${relicId}.jpg`
+        });
+    }
 
-
-const relicsDataArray = [
-  { id: 1, name: "1930年代初期湘赣省地方武装使用的抬枪", spec: "枪管直径4.1cm", period: "1930年代初期", material: "木，铁", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs71&v=1" },
-  { id: 2, name: "明太师木圈椅", spec: "", period: "明代", material: "木", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs81&v=1" },
-  { id: 3, name: "民国龙凤椅", spec: "", period: "民国", material: "复合材质", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs82&v=1" },
-  { id: 4, name: "民国无纹带铜烟盒", spec: "", period: "民国", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs83&v=1" },
-  { id: 5, name: "民国无纹铜烟杆", spec: "", period: "民国", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs84&v=1" },
-  { id: 6, name: "1928年红军送给李尚发的搪瓷杯", spec: "底径10cm，通高14cm", period: "1928年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs85&v=1" },
-  { id: 7, name: "1928年黄洋界保卫战群众给红军送子弹使用的木箱", spec: "长26cm，宽19.5cm，高10.5cm", period: "1928年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs86&v=1" },
-  { id: 8, name: "1928年宁冈县四区二乡工农兵政府使用的马灯残架", spec: "底口径14.2cm，通高35cm", period: "1928年", material: "铁", category: "办公用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs87&v=1" },
-  { id: 9, name: "1928年宁冈县四区二乡工农兵政府使用的马灯", spec: "底径14.2cm，通高35cm", period: "1928年", material: "玻璃，铁", category: "办公用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs88&v=1" },
-  { id: 10, name: "1949年天津解放时黄克诚赠陈正人的半导体收音机", spec: "通长15cm，通宽29cm，通高18.5cm", period: "1949年", material: "铁，其他无机质", category: "名人遗物", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs89&v=1" },
-  { id: 11, name: "1928年永新县某乡工农兵政府主席尹初官使用的印盒", spec: "长5.4cm，宽1.8cm，厚1.5cm", period: "1928年", material: "铁", category: "玺印符牌", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs90&v=1" },
-  { id: 12, name: "1928年红军送给井冈山群众李富祥的铜脸盆", spec: "口径34cm，底径20cm，通高7.5cm", period: "1928年", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs91&v=1" },
-  { id: 13, name: "1928年红军打土豪分给宁冈县群众的绣花小脚布鞋", spec: "长14.8cm，宽4.4cm，厚8.5cm", period: "1928年", material: "棉麻纤维", category: "服装标识", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs92&v=1" },
-  { id: 14, name: "清镂雕描金人文故事图案诗词挂屏", spec: "纵154cm，横194cm，厚3cm", period: "清", material: "木", category: "雕塑", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs93&v=1" },
-  { id: 15, name: "20世纪20年代初期原湘军赵恒惕部第二旅二团士兵贺国中使用的铜笔架", spec: "纵9cm，横4cm，高7.4cm", period: "20世纪20年代初期", material: "铜", category: "名人遗物", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs94&v=1" },
-  { id: 16, name: "1926年「永新六区厚溪第五乡农民协会」条形木印", spec: "纵9.8cm，横1.8cm，厚2.8cm", period: "1926年", material: "木", category: "玺印符牌", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs95&v=1" },
-  { id: 17, name: "1928年红军送给李尚发的搪瓷脸盆", spec: "口径35cm，底径18cm", period: "1928年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs96&v=1" },
-  { id: 18, name: "1931年墨书红军标语的木窗板", spec: "纵66.5cm，横36.5cm，厚度2cm", period: "1931年", material: "木", category: "宣传标语", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs97&v=1" },
-  { id: 19, name: "1931年写有红军标语的木窗门板", spec: "纵66.5cm，横36.5cm，厚度2cm", period: "1931年", material: "木", category: "宣传标语", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs98&v=1" },
-  { id: 20, name: "1931年湘赣省军区兵工厂制造的手榴弹", spec: "弹头直径3.8cm，弹头直径1.6cm，通长11.8cm", period: "1931年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs99&v=1" },
-  { id: 21, name: "1931年湘赣省军区兵工厂制造的手榴弹", spec: "弹头直径3.8cm，弹头直径1.6cm，通长11.7cm", period: "1931年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs100&v=1" },
-  { id: 22, name: "1931年中共湘赣省委宣传部长甘露使用过的铁香烟盒", spec: "纵9.2cm，横1.5cm，高8.5cm", period: "1931年", material: "铁，其他无机质", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs101&v=1" },
-  { id: 23, name: "1965年5月湖南省委书记张平化井冈山题写的七言诗轴", spec: "画心纵64cm，横33cm，整体纵190cm，横47.5cm", period: "1965年5月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs102&v=1" },
-  { id: 24, name: "1965年6月解放军空军副司令员曹里怀在井冈山题写的七言诗轴", spec: "画心纵96cm，横52cm，整体纵205cm，横66.5cm", period: "1965年6月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs103&v=1" },
-  { id: 25, name: "1965年7月郭沫若题词「井冈山大井革命群众集体殉难纪念亭」卷轴", spec: "画心纵16.7cm，横158.5cm，整体纵29cm，横206cm", period: "1965年7月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs104&v=1" },
-  { id: 26, name: "1965年7月郭沫若题「井冈山光荣敬老院」卷轴", spec: "画心纵21.3cm，横137.3cm，整体纵32cm，横184cm", period: "1965年7月", material: "纸", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs105&v=1" },
-  { id: 27, name: "1965年7月郭沫若题写「井冈山小学」卷轴", spec: "画心纵22.2cm，横74.5cm，整体纵32.8cm，横126.5cm", period: "1965年7月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs106&v=1" },
-  { id: 28, name: "第二次国内革命战争时期红军战士罗初林使用的搪瓷脸盆", spec: "口径35cm，底径18cm", period: "1927-1937年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs107&v=1" },
-  { id: 29, name: "第二次国内革命战争时期中华苏维埃共和国国家银行伍分铜币", spec: "直径2.6cm，厚度0.2cm", period: "1927-1937年", material: "铜", category: "钱币", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs108&v=1" },
-  { id: 30, name: "第二次国内革命战争时期中华苏维埃共和国国家银行壹分铜币", spec: "直径1.7cm，厚度0.11cm", period: "1927-1937年", material: "铜", category: "钱币", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs109&v=1" },
-  { id: 31, name: "清光绪木刻描金八仙人物花卉图案诗词挂屏", spec: "纵170cm，横184cm，厚3.7cm", period: "清光绪", material: "木", category: "雕塑", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs110&v=1" },
-  { id: 32, name: "清福禄纹烟丝铜盒", spec: "底纵3cm，横6.5cm，高6.4cm", period: "清", material: "铜", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs111&v=1" },
-  { id: 33, name: "清光绪粉彩花鸟纹攒盘", spec: "纵31.5cm，横31.5cm，高10.5cm", period: "清光绪", material: "木，瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs112&v=1" },
-  { id: 34, name: "清光绪青花山水人物纹笔筒", spec: "口径13cm，底径12.6cm，高14cm", period: "清光绪", material: "瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs113&v=1" },
-  { id: 35, name: "清红釉束口三足香炉", spec: "口径14.5cm，高13.2cm，腹围51.5cm", period: "清", material: "瓷", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs114&v=1" },
-  { id: 36, name: "清康熙青花龙纹香炉", spec: "口径22.2cm，底径20.5cm，高20.4cm", period: "清康熙", material: "瓷", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs115&v=1" },
-  { id: 37, name: "清龙尾挂式铜油灯架", spec: "底径13.2cm，通高20.5cm", period: "清", material: "铜", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs116&v=1" },
-  { id: 38, name: "清描金江夏堂神祖牌", spec: "通长23.5cm，通宽42.5cm，通高49.2cm", period: "清", material: "木", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs117&v=1" },
-  { id: 39, name: "清钱纹铜水烟枪", spec: "底长7.3cm，横3.5cm，通高10.5cm", period: "清", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs118&v=1" },
-  { id: 40, name: "清塔形双层铁烛台", spec: "底边8.6cm，通高29.4cm", period: "清", material: "铁，宝玉石", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs119&v=1" },
-  { id: 41, name: "清铜挂饰", spec: "挂筒长7.1cm，口径0.8cm，通长30cm", period: "清", material: "铜，棉麻纤维", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs120&v=1" },
-  { id: 42, name: "清腰形首饰竹盒", spec: "底纵12.5cm，横22.6cm，高11.2cm", period: "清", material: "竹，铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs121&v=1" },
-  { id: 43, name: "清腰形首饰竹盒", spec: "底纵9.8cm，横16.7cm，高8cm", period: "清", material: "竹，铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs122&v=1" },
-  { id: 44, name: "西晋青瓷唾壶", spec: "口径8.3cm，底径9.5cm，高9.8cm", period: "西晋", material: "瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs123&v=1" }
-];
-
-createApp({
+    createApp({
       setup() {
-        const getThumb = (item) => {
-            const m = item.link.match(/m=([^&]+)/);
-            return m ? 'https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/' + m[1] + '.jpg' : '';
-        };
-        const showHero = ref(!location.search.includes('skipHero=1'));
+        const showHero = ref(true);
         const relicsData = ref(relicsDataArray);
         const activeFilter = ref('All Periods');
         const selectedRelic = ref(null);
@@ -429,23 +395,15 @@ createApp({
         };
 
         const uniquePeriods = computed(() => {
-          const all = relicsData.value.map(r => r.period).filter(Boolean);
-          const distinct = [...new Set(all)];
-          distinct.sort((a, b) => (periodOrder[b] ?? -1) - (periodOrder[a] ?? -1));
-          return ['All Periods', ...distinct];
+          const distinctPeriods = [...new Set(relicsData.value.map(r => r.period))];
+          return ['All Periods', ...distinctPeriods];
         });
 
-        const featuredRelics = computed(() => { const ids = [1, 6, 14, 18, 25, 44]; return ids.map(id => relicsData.value.find(r => r.id === id)).filter(Boolean); });
+        const featuredRelics = computed(() => relicsData.value.slice(0, 6));
 
         const filteredRelics = computed(() => {
-          let result;
-          if (activeFilter.value === 'All Periods') {
-            result = [...relicsData.value];
-          } else {
-            result = relicsData.value.filter(relic => relic.period === activeFilter.value);
-          }
-          result.sort((a, b) => (periodOrder[b.period] ?? -1) - (periodOrder[a.period] ?? -1));
-          return result;
+          if (activeFilter.value === 'All Periods') return relicsData.value;
+          return relicsData.value.filter(relic => relic.period === activeFilter.value);
         });
 
         const setFilter = (period) => {
@@ -463,7 +421,6 @@ createApp({
         };
 
         return {
-          getThumb,
           showHero,
           enterSite,
           relicsData,

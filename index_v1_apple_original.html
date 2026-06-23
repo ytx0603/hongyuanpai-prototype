@@ -1,242 +1,117 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>红源π — 井冈山革命博物馆数字档案</title>
+    <title>红源π | 井冈山革命博物馆数字展厅</title>
+    <!-- 引入 Tailwind CSS v4 体验极致流畅的视觉 -->
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <!-- 引入 Vue 3 驱动核心交互 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- 引入苹果同款极简图标库 Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* === Geist Design System — Light Theme === */
-        /* Inter as Geist Sans substitute; ui-monospace as Geist Mono substitute */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        :root {
-            /* — Colors — */
-            --bg-100: #ffffff;
-            --bg-200: #fafafa;
-            --g-100: #f2f2f2;
-            --g-200: #ebebeb;
-            --g-300: #e6e6e6;
-            --g-400: #eaeaea;
-            --g-500: #c9c9c9;
-            --g-600: #a8a8a8;
-            --g-700: #8f8f8f;
-            --g-800: #7d7d7d;
-            --g-900: #4d4d4d;
-            --g-1000: #171717;
-            --ga-400: rgba(0,0,0,0.08);   /* gray-alpha-400 — default border */
-            --ga-500: rgba(0,0,0,0.21);   /* gray-alpha-500 — hover border */
-            --blue-100: #f0f7ff;
-            --blue-200: #e9f4ff;
-            --blue-300: #dfefff;
-            --blue-700: #006bff;
-            --blue-800: #0059ec;
-            --red-800: #ea001d;
-            /* — Elevation — */
-            --shadow-card: 0 2px 2px rgba(0,0,0,0.04);
-            --shadow-popover: 0 1px 1px rgba(0,0,0,0.02), 0 4px 8px -4px rgba(0,0,0,0.04), 0 16px 24px -8px rgba(0,0,0,0.06);
-            --shadow-modal: 0 1px 1px rgba(0,0,0,0.02), 0 8px 16px -4px rgba(0,0,0,0.04), 0 24px 32px -8px rgba(0,0,0,0.06);
-            /* — Radii — */
-            --r-sm: 6px;
-            --r-md: 12px;
-            --r-full: 9999px;
-            /* — Focus ring: 2px gap (bg-100) + 2px blue-700 — */
-            --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #006bff;
-            /* — Motion: Geist easing — */
-            --ease-geist: cubic-bezier(0.175, 0.885, 0.32, 1.1);
-        }
-
+        /* 苹果官网专属的无衬线系统字体 */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
-            background: var(--bg-100);
-            color: var(--g-1000);
-            letter-spacing: -0.01em;
         }
-
-        /* === Geist Typography Tokens === */
-        .h-56 { font-size: 56px; font-weight: 600; line-height: 56px; letter-spacing: -3.36px; }  /* heading-56 */
-        .h-40 { font-size: 40px; font-weight: 600; line-height: 48px; letter-spacing: -2.4px; }   /* heading-40 */
-        .h-32 { font-size: 32px; font-weight: 600; line-height: 40px; letter-spacing: -1.28px; }  /* heading-32 */
-        .h-24 { font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.96px; }  /* heading-24 */
-        .h-20 { font-size: 20px; font-weight: 600; line-height: 26px; letter-spacing: -0.4px; }   /* heading-20 */
-        .h-16 { font-size: 16px; font-weight: 600; line-height: 24px; letter-spacing: -0.32px; }  /* heading-16 */
-        .h-14 { font-size: 14px; font-weight: 600; line-height: 20px; letter-spacing: -0.28px; }  /* heading-14 */
-        .l-14 { font-size: 14px; font-weight: 400; line-height: 20px; }                          /* label-14 */
-        .l-13 { font-size: 13px; font-weight: 400; line-height: 16px; }                          /* label-13 */
-        .l-12 { font-size: 12px; font-weight: 400; line-height: 16px; }                          /* label-12 */
-        .c-18 { font-size: 18px; font-weight: 400; line-height: 28px; }                          /* copy-18 */
-        .c-14 { font-size: 14px; font-weight: 400; line-height: 20px; }                          /* copy-14 */
-        .c-13 { font-size: 13px; font-weight: 400; line-height: 18px; }                          /* copy-13 */
-        .b-14 { font-size: 14px; font-weight: 500; line-height: 20px; }                          /* button-14 */
-        .b-12 { font-size: 12px; font-weight: 500; line-height: 16px; }                          /* button-12 */
-        .mono { font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace; }
-
+        /* 隐藏滚动条但保留滚动功能 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* Cards — Geist: bg-100, 24px padding, 6px radius, subtle shadow, ga-400 border */
-        .card-geist {
-            background: var(--bg-100);
-            border-radius: var(--r-sm);
-            box-shadow: var(--shadow-card);
-            border: 1px solid var(--ga-400);
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 150ms var(--ease-geist), box-shadow 150ms var(--ease-geist);
-        }
-        .card-geist:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-popover);
-        }
-        .card-geist:focus-visible {
-            box-shadow: var(--focus-ring);
-            outline: none;
-        }
-
-        /* Button — Geist primary: gray-1000 fill, bg-100 text, 40px */
-        .btn-primary {
-            background: var(--g-1000);
-            color: var(--bg-100);
-            border-radius: var(--r-sm);
-            height: 40px;
-            padding: 0 16px;
-            border: none;
-            cursor: pointer;
-            transition: background 150ms var(--ease-geist);
-        }
-        .btn-primary:hover { background: #333; }
-        .btn-primary:focus-visible { box-shadow: var(--focus-ring); outline: none; }
-
-        /* Pill — Geist: 32px, 6px radius, border toggle */
-        .pill {
-            border-radius: var(--r-sm);
-            padding: 0 10px;
-            height: 32px;
-            border: 1px solid var(--ga-400);
-            cursor: pointer;
-            transition: all 150ms var(--ease-geist);
-            white-space: nowrap;
-            background: var(--bg-100);
-            color: var(--g-900);
-        }
-        .pill-active {
-            background: var(--g-1000);
-            color: var(--bg-100);
-            border-color: var(--g-1000);
-        }
-        .pill:focus-visible { box-shadow: var(--focus-ring); outline: none; }
-
-        /* Input — Geist: bg-100, ga-400 border, 40px height, 6px radius */
-        .input-geist {
-            background: var(--bg-100);
-            border: 1px solid var(--ga-400);
-            border-radius: var(--r-sm);
-            height: 40px;
-            padding: 0 12px 0 34px;
-            color: var(--g-1000);
-            outline: none;
-            transition: border-color 150ms var(--ease-geist);
-        }
-        .input-geist:focus { border-color: var(--blue-700); box-shadow: var(--focus-ring); }
-
-        /* Focus ring global */
-        button:focus-visible, a:focus-visible, [tabindex]:focus-visible { box-shadow: var(--focus-ring); outline: none; }
-
-        /* Modal transitions — Geist: 300ms overlay */
-        .modal-enter-active { transition: opacity 300ms var(--ease-geist); }
-        .modal-leave-active { transition: opacity 150ms var(--ease-geist); }
-        .modal-enter-from, .modal-leave-to { opacity: 0; }
-        .modal-enter-active .modal-shell { transition: transform 300ms var(--ease-geist); }
-        .modal-leave-active .modal-shell { transition: transform 150ms var(--ease-geist); }
-        .modal-enter-from .modal-shell { transform: scale(0.97) translateY(10px); }
-        .modal-leave-to .modal-shell { transform: scale(0.98); }
-
-        @media (prefers-reduced-motion: reduce) {
-            .card-geist, .pill, .btn-primary,
-            .modal-enter-active, .modal-leave-active,
-            .modal-enter-active .modal-shell, .modal-leave-active .modal-shell {
-                transition: none !important;
-            }
-        }
     </style>
 </head>
-<body class="antialiased min-h-screen">
+<body class="bg-[#f5f5f7] text-[#1d1d1f] antialiased min-h-screen">
 
 <div id="app">
-    <!-- ===== Nav — Geist: sticky, bg-100, ga-400 border, 56px height ===== -->
-    <nav class="sticky top-0 z-40 border-b" style="background:var(--bg-100); border-color:var(--ga-400)">
-        <div class="mx-auto px-6 flex items-center justify-between" style="max-width:1200px; height:56px;">
-            <div @click="resetFilters" class="flex items-center gap-2 cursor-pointer select-none">
-                <span class="h-16" style="color:var(--g-1000)">红源π</span>
-                <span class="l-12" style="color:var(--g-700)">Digital Heritage</span>
+    <!-- 1. Apple-style 毛玻璃顶部导航栏 -->
+    <nav class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#f5f5f7]/70 border-b border-[#d2d2d7]/30 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
+            <!-- Team Logo -->
+            <div class="flex items-center space-x-2 cursor-pointer" @click="resetFilters">
+                <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">红源π</span>
+                <span class="text-[#86868b] text-xs font-light">|</span>
+                <span class="text-[#1d1d1f] text-sm font-medium tracking-wide">数字革命展厅</span>
             </div>
-            <div class="relative" style="width:260px">
-                <input v-model="searchQuery" type="search" placeholder="Search relics…" class="input-geist l-14" style="width:100%">
-                <i data-lucide="search" class="w-4 h-4 absolute" style="left:10px; top:12px; color:var(--g-700)"></i>
+            
+            <!-- 极简搜索框 -->
+            <div class="relative w-64 md:w-80">
+                <input v-model="searchQuery" type="text" placeholder="搜索革命文物..." 
+                       class="w-full bg-[#e8e8ed]/60 text-xs rounded-full pl-9 pr-4 py-1.5 focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-500/50 transition-all duration-200 text-[#1d1d1f]">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#86868b]"></i>
             </div>
         </div>
     </nav>
 
-    <!-- ===== Hero — heading-40/56, spacious whitespace (96px top, 64px bottom) ===== -->
-    <header class="mx-auto px-6 text-center" style="max-width:800px; padding-top:96px; padding-bottom:64px;">
-        <p class="l-14" style="color:var(--g-700); margin-bottom:16px">井冈山革命博物馆 · 数字孪生档案</p>
-        <h1 class="h-40 md:h-56" style="color:var(--g-1000); line-height:1.08;">
-            44 件文物<br>
-            <span style="color:var(--blue-700)">在 3D 空间里重燃</span>
+    <!-- 2. Hero 巨幕巨幅留白区 -->
+    <header class="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center">
+        <p class="text-xs font-semibold tracking-widest text-red-600 uppercase mb-3">红源π 数字化时代巨献</p >
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-[#1d1d1f] leading-tight">
+            井冈山革命文物 <br>
+            <span class="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 bg-clip-text text-transparent">在 3D 空间里重燃</span>
         </h1>
-        <p class="c-18" style="color:var(--g-700); margin-top:40px; max-width:560px; margin-left:auto; margin-right:auto">
-            点击卡片，近距离感受革命文物的每一处细节。
-        </p>
+        <p class="text-lg md:text-xl text-[#86868b] mt-6 max-w-2xl mx-auto font-normal leading-relaxed">
+            触摸一件文物，就是触摸一段历史。点击卡片，用 3D 视角近距离感受革命文物的每一处细节。
+        </p >
     </header>
 
-    <!-- ===== Filters — Geist pills: 32px height, 6px radius ===== -->
-    <section class="mx-auto px-6" style="max-width:1200px; margin-bottom:32px">
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-            <button @click="selectedPeriod = ''" :tabindex="0"
-                :class="selectedPeriod === '' ? 'pill pill-active b-12' : 'pill b-12'">
-                All
+    <!-- 3. 全局筛选器控制台 (横向滚动胶囊) -->
+    <section class="max-w-7xl mx-auto px-6 mb-12">
+        <div class="flex items-center space-x-3 overflow-x-auto no-scrollbar py-2">
+            <button @click="selectedPeriod = ''" 
+                    :class="selectedPeriod === '' ? 'bg-[#1d1d1f] text-white' : 'bg-white text-[#1d1d1f] hover:bg-[#e8e8ed]' "
+                    class="text-xs font-medium px-4 py-2 rounded-full transition-all duration-200 shadow-sm whitespace-nowrap cursor-pointer">
+                全部时代
             </button>
-            <button v-for="p in periods" :key="p" @click="selectedPeriod = p" :tabindex="0"
-                :class="selectedPeriod === p ? 'pill pill-active b-12' : 'pill b-12'">
+            <button v-for="p in periods" :key="p" @click="selectedPeriod = p"
+                    :class="selectedPeriod === p ? 'bg-red-600 text-white' : 'bg-white text-[#1d1d1f] hover:bg-[#e8e8ed]' "
+                    class="text-xs font-medium px-4 py-2 rounded-full transition-all duration-200 shadow-sm whitespace-nowrap cursor-pointer">
                 {{ p }}
             </button>
         </div>
     </section>
 
-    <!-- ===== Grid — Geist cards, 3-col, 16px gap ===== -->
-    <main class="mx-auto px-6" style="max-width:1200px; padding-bottom:96px">
-        <div v-if="filteredRelics.length === 0" class="text-center" style="padding:96px 0">
-            <p class="h-20" style="color:var(--g-700)">No matching relics</p>
-            <p class="c-14" style="color:var(--g-600); margin-top:8px">Adjust your search or filter to find more</p>
+    <!-- 4. Bento Box (便当盒) 卡片式网格流 -->
+    <main class="max-w-7xl mx-auto px-6 pb-24">
+        <!-- 空状态提示 -->
+        <div v-if="filteredRelics.length === 0" class="text-center py-20">
+            <i data-lucide="inbox" class="w-12 h-12 mx-auto text-[#86868b] stroke-1"></i>
+            <p class="text-[#86868b] mt-4 text-sm">未能找到符合条件的文物</p >
         </div>
 
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            <div v-for="item in filteredRelics" :key="item.id" @click="open3DModal(item)" tabindex="0"
-                class="card-geist">
-                <!-- Image — 176px height, g-100 placeholder -->
-                <div class="overflow-hidden" style="height:176px; background:var(--g-100)">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 每一个卡片都是一件艺术品 -->
+            <div v-for="item in filteredRelics" :key="item.id" @click="open3DModal(item)"
+                 class="group bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.02)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#d2d2d7]/20 overflow-hidden cursor-pointer transform hover:scale-[1.01] transition-all duration-300">
+
+                <!-- 缩略图区 -->
+                <div class="h-[160px] bg-[#e8e8ed] overflow-hidden">
                     <img :src="getThumb(item)" :alt="item.name"
-                        class="w-full h-full object-cover"
-                        loading="lazy" onerror="this.style.display='none'">
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                         loading="lazy"
+                         onerror="this.style.display='none'">
                 </div>
-                <!-- Content — Geist: 24px padding (16px top, 24px sides/bottom) -->
-                <div style="padding:16px 24px 24px 24px">
-                    <div class="flex items-center justify-between" style="margin-bottom:8px">
-                        <span class="l-12" style="display:inline-block;background:var(--g-100);color:var(--g-900);border-radius:var(--r-sm);padding:2px 8px">{{ item.category || '珍贵文物' }}</span>
-                        <span class="l-12 mono" style="color:var(--g-600)">#{{ item.id }}</span>
+
+                <!-- 卡片文字内容 -->
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-md bg-red-50 text-red-600">
+                            {{ item.category || '珍贵文物' }}
+                        </span>
+                        <span class="text-[11px] text-[#86868b] font-mono">ID: jgs{{ item.id }}</span>
                     </div>
-                    <h3 class="h-14" style="color:var(--g-1000); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.5rem; margin-bottom:12px">{{ item.name }}</h3>
-                    <!-- Footer — border-top ga-400 -->
-                    <div class="flex items-center justify-between" style="padding-top:12px; border-top:1px solid var(--ga-400)">
-                        <div>
-                            <p class="l-12" style="color:var(--g-700)">{{ item.period }}</p>
-                            <p class="l-12" style="color:var(--g-700)">{{ item.material || '复合材质' }}</p>
+
+                    <h3 class="text-base font-bold text-[#1d1d1f] leading-snug group-hover:text-red-600 transition-colors duration-200 line-clamp-2 min-h-[3rem]">
+                        {{ item.name }}
+                    </h3>
+
+                    <div class="mt-4 border-t border-[#f5f5f7] pt-3 flex justify-between items-end">
+                        <div class="space-y-0.5">
+                            <p class="text-xs text-[#86868b]">年代：<span class="text-[#1d1d1f] font-medium">{{ item.period }}</span></p >
+                            <p class="text-xs text-[#86868b]">材质：<span class="text-[#1d1d1f] font-medium">{{ item.material || '复合材质' }}</span></p >
                         </div>
-                        <div style="width:28px; height:28px; border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; background:var(--g-100); transition:background 150ms var(--ease-geist)">
-                            <i data-lucide="arrow-up-right" class="w-3.5 h-3.5" style="color:var(--g-700)"></i>
+                        <div class="w-8 h-8 rounded-full bg-[#f5f5f7] group-hover:bg-red-600 flex items-center justify-center transition-all duration-300">
+                            <i data-lucide="arrow-up-right" class="w-4 h-4 text-[#1d1d1f] group-hover:text-white transition-colors duration-300"></i>
                         </div>
                     </div>
                 </div>
@@ -244,40 +119,36 @@
         </div>
     </main>
 
-    <!-- ===== Footer — minimal ===== -->
-    <footer class="border-t text-center" style="border-color:var(--ga-400); padding:40px 0">
-        <p class="h-14" style="color:var(--g-1000); margin-bottom:4px">红源π</p>
-        <p class="l-12" style="color:var(--g-700)">AI 赋能红色文物保护 · 井冈山革命博物馆合作项目</p>
-        <p class="l-12" style="color:var(--g-600); margin-top:16px">数据源：井冈山革命博物馆 · 3D 引擎：4DAGE</p>
-    </footer>
-
-    <!-- ===== Modal — Geist dialog: 12px radius, white bg, shadow-modal ===== -->
-    <transition name="modal">
-        <div v-if="currentRelic" class="fixed inset-0 z-50 flex items-center justify-center" style="padding:24px">
-            <div class="absolute inset-0" style="background:rgba(0,0,0,0.5)" @click="closeModal"></div>
-            <div class="modal-shell w-full overflow-hidden flex flex-col relative z-10"
-                style="max-width:1120px; height:90vh; background:var(--bg-100); border-radius:var(--r-md); box-shadow:var(--shadow-modal)">
-                <!-- Header -->
-                <div class="flex justify-between items-center" style="padding:16px 24px; border-bottom:1px solid var(--ga-400)">
-                    <div>
-                        <span class="l-12" style="color:var(--g-700); text-transform:uppercase; letter-spacing:0.05em">3D Preview</span>
-                        <h2 class="h-16" style="color:var(--g-1000); margin-top:2px">{{ currentRelic.name }}</h2>
+    <!-- 5. Apple Theater 沉浸式 3D 展厅弹窗 (Modal) -->
+    <transition name="fade">
+        <div v-if="currentRelic" class="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4 md:p-10">
+            <!-- 背景暗化遮罩 -->
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-md" @click="closeModal"></div>
+            
+            <!-- 核心剧幕外壳 -->
+            <div class="bg-[#1d1d1f] w-full max-w-6xl h-full rounded-3xl overflow-hidden shadow-2xl flex flex-col relative z-10 border border-white/10 animate-in fade-in zoom-in-95 duration-300">
+                
+                <!-- 视窗控制头部 -->
+                <div class="px-6 py-4 bg-black/40 border-b border-white/5 flex justify-between items-center">
+                    <div class="text-white">
+                        <span class="text-[10px] uppercase font-bold tracking-widest text-red-500">红源π Spatiotemporal Rendering</span>
+                        <h2 class="text-base md:text-lg font-bold tracking-tight mt-0.5">{{ currentRelic.name }}</h2>
                     </div>
-                    <button @click="closeModal"
-                        style="width:32px; height:32px; border-radius:var(--r-sm); border:1px solid var(--ga-400); background:var(--bg-100); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 150ms var(--ease-geist)"
-                        onmouseover="this.style.background='var(--g-100)'" onmouseout="this.style.background='var(--bg-100)'">
-                        <i data-lucide="x" class="w-4 h-4" style="color:var(--g-700)"></i>
+                    <button @click="closeModal" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all duration-200 cursor-pointer">
+                        <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
-                <!-- 3D Viewer -->
-                <div class="flex-1" style="background:#000">
+                
+                <!-- 3D 渲染核心区 -->
+                <div class="flex-1 bg-black relative">
                     <iframe :src="currentRelic.link" class="w-full h-full border-0" allowfullscreen></iframe>
                 </div>
-                <!-- Footer — bg-200 for subtle separation -->
-                <div class="flex flex-wrap" style="padding:12px 24px; background:var(--bg-200); border-top:1px solid var(--ga-400); gap:24px">
-                    <span class="l-12" style="color:var(--g-700)">级别 <b style="color:var(--g-1000);font-weight:600">{{ currentRelic.level || '未定级' }}</b></span>
-                    <span v-if="currentRelic.spec" class="l-12" style="color:var(--g-700)">规格 <b style="color:var(--g-1000);font-weight:600">{{ currentRelic.spec }}</b></span>
-                    <span class="l-12" style="color:var(--g-700)">数据源 井冈山革命博物馆</span>
+
+                <!-- 视窗底部数据面板 -->
+                <div class="px-6 py-4 bg-black/40 border-t border-white/5 flex flex-wrap gap-6 text-xs text-[#86868b]">
+                    <div>级别：<span class="text-white font-medium">{{ currentRelic.level || '国家级文物' }}</span></div>
+                    <div v-if="currentRelic.spec">规格：<span class="text-white font-medium">{{ currentRelic.spec }}</span></div>
+                    <div>数据源：井冈山革命博物馆</div>
                 </div>
             </div>
         </div>
@@ -289,10 +160,22 @@ const { createApp, ref, computed, watch, onMounted, nextTick } = Vue;
 
 // 历史时期排序映射（值越大越新）
 const periodOrder = {
-  "西晋": 0, "明代": 100, "清康熙": 200, "清": 250, "清光绪": 300,
-  "民国": 400, "20世纪20年代初期": 450, "1926年": 460, "1927-1937年": 470,
-  "1928年": 480, "1930年代初期": 490, "1931年": 500, "1949年": 600,
-  "1965年5月": 700, "1965年6月": 710, "1965年7月": 720
+  "西晋": 0,
+  "明代": 100,
+  "清康熙": 200,
+  "清": 250,
+  "清光绪": 300,
+  "民国": 400,
+  "20世纪20年代初期": 450,
+  "1926年": 460,
+  "1927-1937年": 470,
+  "1928年": 480,
+  "1930年代初期": 490,
+  "1931年": 500,
+  "1949年": 600,
+  "1965年5月": 700,
+  "1965年6月": 710,
+  "1965年7月": 720
 };
 
 // 从 jgsxiaowenwu.xlsx 自动生成的 44 件文物数据
@@ -349,18 +232,22 @@ createApp({
         const selectedPeriod = ref('');
         const currentRelic = ref(null);
 
+        // 从 3D 模型链接中提取缩略图 URL
         const getThumb = (item) => {
             const m = item.link.match(/m=([^&]+)/);
             return m ? `https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/${m[1]}.jpg` : '';
         };
 
+        // 统一图标初始化
         const initIcons = () => { nextTick(() => { if(window.lucide) lucide.createIcons(); }); };
 
+        // 提取去重后的时间线标签（从后往前）
         const periods = computed(() => {
             const all = relicsData.map(item => item.period).filter(Boolean);
             return [...new Set(all)].sort((a, b) => (periodOrder[b] ?? -1) - (periodOrder[a] ?? -1));
         });
 
+        // 核心过滤 + 排序算法
         const filteredRelics = computed(() => {
             return relicsData
                 .filter(item => {
@@ -376,6 +263,7 @@ createApp({
                 .sort((a, b) => (periodOrder[b.period] ?? -1) - (periodOrder[a.period] ?? -1));
         });
 
+        // 过滤结果变化后重新渲染图标（不能在 computed 里做）
         watch(filteredRelics, () => {
             nextTick(() => { if(window.lucide) lucide.createIcons(); });
         });
@@ -387,8 +275,15 @@ createApp({
         onMounted(() => { initIcons(); });
 
         return {
-            searchQuery, selectedPeriod, periods, filteredRelics, currentRelic,
-            getThumb, open3DModal, closeModal, resetFilters
+            searchQuery,
+            selectedPeriod,
+            periods,
+            filteredRelics,
+            currentRelic,
+            getThumb,
+            open3DModal,
+            closeModal,
+            resetFilters
         }
     }
 }).mount('#app')

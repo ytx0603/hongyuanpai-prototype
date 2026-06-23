@@ -31,6 +31,9 @@
       color: #ededed;
       font-family: 'Inter', sans-serif;
     }
+    html {
+      scroll-behavior: smooth;
+    }
     body {
       margin: 0;
       overflow-x: hidden;
@@ -169,10 +172,10 @@
             <!-- Triangle Logo -->
             <div class="w-5 h-5 bg-white" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);"></div>
             <nav class="hidden md:flex gap-6 text-gray-400 font-medium tracking-wide">
-              <a href="#" class="hover:text-white transition">Digital Twin</a>
-              <a href="#" class="hover:text-white transition">Catalog</a>
-              <a href="#" class="hover:text-white transition">Enterprise</a>
-              <a href="#" class="hover:text-white transition">About</a>
+              <a href="index_v3.html?skipHero=1" class="hover:text-white transition">Digital Twin</a>
+              <a @click.prevent="enterSite('hongyuanpi')" href="#" class="hover:text-white transition">Hongyuanπ</a>
+              <a @click.prevent="enterSite('timeline')" href="#" class="hover:text-white transition">Timeline</a>
+              <a @click.prevent="enterSite('partners')" href="#" class="hover:text-white transition">Partners</a>
             </nav>
           </div>
           <div class="flex items-center gap-4 font-medium">
@@ -226,7 +229,7 @@
       </div>
     </transition>
 
-    <!-- Main Content (Museum Interface) -->
+    <!-- Main Content (Platform Homepage) -->
     <transition name="content-fade">
       <main v-if="!showHero" class="min-h-screen bg-v-black relative z-10">
         
@@ -237,96 +240,68 @@
               <span class="font-bold text-v-gray-text-1 text-xl tracking-tight">红源π</span>
               <span class="relic-tag uppercase !tracking-[0.1em] text-[10px]">DIGITAL HERITAGE</span>
             </a>
-            <div class="flex items-center gap-4">
-              <input type="search" placeholder="Search relics..." class="h-9 px-3 rounded-md bg-white/5 border border-white/10 text-white text-sm focus:border-v-blue focus:bg-black transition w-[200px] md:w-[240px] outline-none" />
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+              <a href="index_v3.html?skipHero=1" class="hover:text-white transition">Digital Twin</a>
+              <a href="hongyuanpi.html" class="hover:text-white transition">Hongyuanπ</a>
+              <a href="timeline.html" class="hover:text-white transition">Timeline</a>
+              <a href="partners.html" class="hover:text-white transition">Partners</a>
             </div>
           </div>
         </nav>
-        
-        <div class="max-w-[1280px] mx-auto px-6 py-12 md:py-16">
-          
-          <!-- Hero section for Main Content -->
-          <header class="mb-16">
-            <p class="text-white uppercase text-xs font-medium tracking-[0.18em] mb-4">JINGGANGSHAN REVOLUTIONARY MUSEUM</p>
-            <h2 class="font-bold text-v-gray-text-1 leading-tight tracking-[-0.045em] mb-4 text-4xl md:text-5xl">44 件革命文物 / <span class="text-v-blue">数字孪生档案</span></h2>
-            <p class="text-v-gray-text-2 text-lg md:text-xl max-w-3xl mt-4">利用高精度 AI 三维数字化技术，永久保存井冈山革命博物馆精选革命文物的数字档案，实现革命精神的数字化永续传承。</p>
-          </header>
 
-          <!-- Featured Relics -->
-          <section class="mb-20">
-            <div class="flex items-center gap-3 mb-6">
-              <span class="relic-tag uppercase tracking-[0.1em] text-v-blue">FEATURED</span>
-              <h3 class="font-semibold text-v-gray-text-1 text-2xl tracking-tight">精选文物</h3>
-            </div>
-            <div class="featured-scroll flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4">
-              <div 
-                v-for="relic in featuredRelics" 
-                :key="'feat-' + relic.id"
-                class="relic-card flex-none w-[280px] md:w-[300px] snap-start p-4"
-                @click="openRelicModal(relic)"
-              >
-                <div class="aspect-square bg-black rounded-md mb-4 overflow-hidden relative border border-white/5">
-                  <img :src="getThumb(relic)" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
-                </div>
-                <div class="flex items-start gap-2 mb-2">
-                   <span class="relic-tag mt-0.5">{{ relic.period }}</span>
-                   <h4 class="font-semibold text-v-gray-text-1 text-base leading-tight">{{ relic.name }}</h4>
-                </div>
-                <p class="text-v-gray-text-3 text-xs line-clamp-2 mt-2">{{ relic.spec }}</p>
-              </div>
-            </div>
-          </section>
+        <!-- ====== Section 1: Digital Twin ====== -->
+        <section id="digital-twin" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #0a0a0f 50%, #000 100%)">
+          <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 01</p>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">数字孪生档案</h2>
+          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">44 件井冈山革命文物 · 高精度三维数字化记录</p>
+          <a href="index_v3.html?skipHero=1" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
+            Explore Relics
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </a>
+        </section>
 
-          <!-- All Relics -->
-          <section>
-            <div class="flex items-center gap-3 mb-6">
-               <h3 class="font-semibold text-v-gray-text-1 text-2xl tracking-tight">所有文物</h3>
-               <span class="relic-tag !bg-black border border-white/10 text-v-gray-text-2 font-mono">Total {{ relicsData.length }}</span>
-            </div>
-            
-            <!-- Filters -->
-            <div class="flex flex-wrap gap-2 mb-10">
-              <button 
-                v-for="period in uniquePeriods" 
-                :key="period"
-                class="filter-capsule" 
-                :class="{ active: activeFilter === period }"
-                @click="setFilter(period)"
-              >
-                {{ period }}
-              </button>
-            </div>
-            
-            <!-- Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div 
-                v-for="relic in filteredRelics" 
-                :key="relic.id"
-                class="relic-card p-4 flex flex-col"
-                @click="openRelicModal(relic)"
-              >
-                <div class="aspect-[4/3] bg-black rounded-md mb-4 overflow-hidden border border-white/5">
-                  <img :src="getThumb(relic)" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
-                </div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                   <span class="relic-tag">{{ relic.category }}</span>
-                   <span class="text-v-gray-text-3 text-xs">{{ relic.period }}</span>
-                </div>
-                <h4 class="font-semibold text-v-gray-text-1 text-sm leading-snug mb-1 flex-1">{{ relic.name }}</h4>
-              </div>
-            </div>
-          </section>
+        <!-- ====== Section 2: Hongyuanπ ====== -->
+        <section id="hongyuanpi" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #050510 50%, #000 100%)">
+          <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 02</p>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">红源π</h2>
+          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">基于数智融合的革命文物活化研究新范式</p>
+          <a href="hongyuanpi.html" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
+            Learn More
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </a>
+        </section>
 
-          <!-- Footer -->
-          <footer class="mt-24 py-12 border-t border-v-border text-center text-v-gray-text-3 text-sm">
-            <p class="mb-2">© 2026 红源π数字化革命文物保护项目. 版权所有.</p>
-            <p class="font-mono text-xs opacity-50">DIGITAL HERITAGE | AI + ARCHIVE | ALPHA v3.0</p>
-          </footer>
-        </div>
+        <!-- ====== Section 3: Timeline ====== -->
+        <section id="timeline" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #0a0a10 50%, #000 100%)">
+          <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 03</p>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">发展历程</h2>
+          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">从井冈山到数字未来 · 我们的每一步</p>
+          <a href="timeline.html" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
+            View Timeline
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </a>
+        </section>
+
+        <!-- ====== Section 4: Partners ====== -->
+        <section id="partners" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:linear-gradient(180deg, #000 0%, #05050f 50%, #000 100%)">
+          <p class="text-v-blue uppercase text-xs font-medium tracking-[0.18em] mb-4">Section 04</p>
+          <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(40px,6vw,72px)">合作单位</h2>
+          <p class="text-v-gray-text-2 text-lg md:text-xl max-w-xl mb-12">井冈山革命博物馆 · 4DAGE · 江西师范大学 · 瑞金叶坪</p>
+          <a href="partners.html" class="inline-flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-6 py-3 rounded-full font-semibold transition text-[15px]">
+            View Partners
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </a>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-12 border-t border-v-border text-center text-v-gray-text-3 text-sm">
+          <p class="mb-2">© 2026 红源π数字化革命文物保护项目</p>
+          <p class="font-mono text-xs opacity-50">DIGITAL HERITAGE | AI + ARCHIVE</p>
+        </footer>
       </main>
     </transition>
 
-    <!-- Modal -->
+<!-- Modal -->
     <div class="relic-modal-overlay" :class="{ open: !!selectedRelic }" @click.self="closeRelicModal">
       <div v-if="selectedRelic" class="relic-modal">
         <div class="h-14 px-5 border-b border-v-border flex items-center justify-between bg-black/50">
@@ -419,13 +394,19 @@ createApp({
             const m = item.link.match(/m=([^&]+)/);
             return m ? 'https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/' + m[1] + '.jpg' : '';
         };
-        const showHero = ref(!location.search.includes('skipHero=1'));
+        const showHero = ref(true);
         const relicsData = ref(relicsDataArray);
         const activeFilter = ref('All Periods');
         const selectedRelic = ref(null);
 
-        const enterSite = () => {
+        const enterSite = (target) => {
           showHero.value = false;
+          if (target) {
+            setTimeout(() => {
+              const el = document.getElementById(target);
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 700);
+          }
         };
 
         const uniquePeriods = computed(() => {
