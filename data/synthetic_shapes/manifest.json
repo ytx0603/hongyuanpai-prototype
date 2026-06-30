@@ -1,0 +1,26 @@
+{
+  "sphere": {
+    "n_clean": 2048,
+    "types": [
+      "crack",
+      "spall",
+      "weather"
+    ]
+  },
+  "cube": {
+    "n_clean": 2046,
+    "types": [
+      "crack",
+      "spall",
+      "weather"
+    ]
+  },
+  "cylinder": {
+    "n_clean": 2048,
+    "types": [
+      "crack",
+      "spall",
+      "weather"
+    ]
+  }
+}

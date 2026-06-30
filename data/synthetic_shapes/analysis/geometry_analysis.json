@@ -1,0 +1,155 @@
+{
+  "sphere": {
+    "n_clean": 2048,
+    "baseline": {
+      "density_mean": 0.0481665096989797,
+      "density_std": 0.009400680649375425,
+      "curvature_mean": 0.0024082273976686816,
+      "curvature_std": 0.0006893727016675261
+    },
+    "crack": {
+      "n_pts": 2150,
+      "delta_n": 102,
+      "density_mean": 0.05012695529062343,
+      "density_std": 0.015066781722704928,
+      "curvature_mean": 0.012769460388185643,
+      "curvature_std": 0.03064358454906737,
+      "boundary_dist_mean": 0.006650618109933935,
+      "boundary_dist_std": 0.037861491559138,
+      "boundary_dist_p95": 0.0,
+      "normal_cos_mean": 0.9995067264774005,
+      "normal_cos_std": 0.0018164214585062333,
+      "outlier_ratio": 0.02186046511627907
+    },
+    "spall": {
+      "n_pts": 1951,
+      "delta_n": -97,
+      "density_mean": 0.04813793370964707,
+      "density_std": 0.009662962530565285,
+      "curvature_mean": 0.0024573169155981574,
+      "curvature_std": 0.0007926119228265804,
+      "boundary_dist_mean": 0.0,
+      "boundary_dist_std": 0.0,
+      "boundary_dist_p95": 0.0,
+      "normal_cos_mean": 0.9999262740655596,
+      "normal_cos_std": 0.00046703193996859007,
+      "outlier_ratio": 0.0
+    },
+    "weather": {
+      "n_pts": 2048,
+      "delta_n": 0,
+      "density_mean": 0.07559124588666236,
+      "density_std": 0.01696103408385652,
+      "curvature_mean": 0.17512058050300516,
+      "curvature_std": 0.04359327411136579,
+      "boundary_dist_mean": 0.05567252874317777,
+      "boundary_dist_std": 0.034206576474729446,
+      "boundary_dist_p95": 0.1217717855055872,
+      "normal_cos_mean": 0.8972372290009336,
+      "normal_cos_std": 0.16411475513025123,
+      "outlier_ratio": 0.009765625
+    }
+  },
+  "cube": {
+    "n_clean": 2046,
+    "baseline": {
+      "density_mean": 0.06589800849049302,
+      "density_std": 0.013568510960340051,
+      "curvature_mean": 0.030317873039016067,
+      "curvature_std": 0.038522606361412894
+    },
+    "crack": {
+      "n_pts": 2148,
+      "delta_n": 102,
+      "density_mean": 0.06742152278599814,
+      "density_std": 0.017024064723349618,
+      "curvature_mean": 0.038822829297157205,
+      "curvature_std": 0.043394132934255585,
+      "boundary_dist_mean": 0.007787043026871308,
+      "boundary_dist_std": 0.04097113057760962,
+      "boundary_dist_p95": 0.0,
+      "normal_cos_mean": 0.9971662237604173,
+      "normal_cos_std": 0.027912456161780244,
+      "outlier_ratio": 0.027467411545623835
+    },
+    "spall": {
+      "n_pts": 1883,
+      "delta_n": -163,
+      "density_mean": 0.06834219673129875,
+      "density_std": 0.015061640862666195,
+      "curvature_mean": 0.03052913400196524,
+      "curvature_std": 0.03921545768119,
+      "boundary_dist_mean": 0.0,
+      "boundary_dist_std": 0.0,
+      "boundary_dist_p95": 0.0,
+      "normal_cos_mean": 0.9985238163629429,
+      "normal_cos_std": 0.00680028304317584,
+      "outlier_ratio": 0.0
+    },
+    "weather": {
+      "n_pts": 2046,
+      "delta_n": 0,
+      "density_mean": 0.09500440063603666,
+      "density_std": 0.021061340273544057,
+      "curvature_mean": 0.16475992559805366,
+      "curvature_std": 0.04404063549609721,
+      "boundary_dist_mean": 0.06257561627427607,
+      "boundary_dist_std": 0.036720632063369604,
+      "boundary_dist_p95": 0.1318569027218584,
+      "normal_cos_mean": 0.9018256034832784,
+      "normal_cos_std": 0.15081046396088793,
+      "outlier_ratio": 0.013685239491691105
+    }
+  },
+  "cylinder": {
+    "n_clean": 2048,
+    "baseline": {
+      "density_mean": 0.03756725773039639,
+      "density_std": 0.007824704390839606,
+      "curvature_mean": 0.0031800146318028844,
+      "curvature_std": 0.0015279054392403856
+    },
+    "crack": {
+      "n_pts": 2150,
+      "delta_n": 102,
+      "density_mean": 0.04013160901947261,
+      "density_std": 0.016839226507461388,
+      "curvature_mean": 0.014261942234771868,
+      "curvature_std": 0.03381948208982135,
+      "boundary_dist_mean": 0.0054071568498582955,
+      "boundary_dist_std": 0.029180769324925505,
+      "boundary_dist_p95": 0.0,
+      "normal_cos_mean": 0.9994435130362547,
+      "normal_cos_std": 0.002425312324468716,
+      "outlier_ratio": 0.02558139534883721
+    },
+    "spall": {
+      "n_pts": 1885,
+      "delta_n": -163,
+      "density_mean": 0.038944460155199,
+      "density_std": 0.008765921661323325,
+      "curvature_mean": 0.0034387221432041646,
+      "curvature_std": 0.0017680312155012297,
+      "boundary_dist_mean": 0.0,
+      "boundary_dist_std": 0.0,
+      "boundary_dist_p95": 0.0,
+      "normal_cos_mean": 0.9998579481301754,
+      "normal_cos_std": 0.0005090314624574205,
+      "outlier_ratio": 0.0
+    },
+    "weather": {
+      "n_pts": 2048,
+      "delta_n": 0,
+      "density_mean": 0.06303690914706922,
+      "density_std": 0.016111286668745926,
+      "curvature_mean": 0.1805246891457169,
+      "curvature_std": 0.04201148364564458,
+      "boundary_dist_mean": 0.048456602701413845,
+      "boundary_dist_std": 0.03067544991527393,
+      "boundary_dist_p95": 0.1095019452588031,
+      "normal_cos_mean": 0.8768259793726443,
+      "normal_cos_std": 0.18697140093493966,
+      "outlier_ratio": 0.00830078125
+    }
+  }
+}
