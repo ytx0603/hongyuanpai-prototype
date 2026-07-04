@@ -269,7 +269,7 @@
                 @click="openRelicModal(relic)"
               >
                 <div class="aspect-square bg-black rounded-md mb-4 overflow-hidden relative border border-white/5">
-                  <img :src="getThumb(relic)" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
+                  <img :src="getThumb(relic)" :alt="relic.name" loading="lazy" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
                 </div>
                 <div class="flex items-start gap-2 mb-2">
                    <span class="relic-tag mt-0.5">{{ relic.period }}</span>
@@ -309,7 +309,7 @@
                 @click="openRelicModal(relic)"
               >
                 <div class="aspect-[4/3] bg-black rounded-md mb-4 overflow-hidden border border-white/5">
-                  <img :src="getThumb(relic)" :alt="relic.name" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
+                  <img :src="getThumb(relic)" :alt="relic.name" loading="lazy" class="w-full h-full object-cover opacity-80 hover:opacity-100 transition duration-300" />
                 </div>
                 <div class="flex items-center justify-between gap-2 mb-2">
                    <span class="relic-tag">{{ relic.category }}</span>
