@@ -156,8 +156,8 @@
       overflow: hidden;
       box-shadow: 0 1px 1px rgba(0, 0, 0, 0.02), 0 8px 16px -4px rgba(0, 0, 0, 0.04), 0 24px 32px -8px rgba(0, 0, 0, 0.06);
       display: flex;
-      flex-direction: column;
     }
+  @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -341,7 +341,13 @@
            <button class="filter-capsule !px-2 !rounded-full text-xs" @click="closeRelicModal">CLOSE ×</button>
         </div>
         <div class="flex-1 overflow-y-auto bg-[#0a0a0a]">
-          <iframe :src="selectedRelic.link" frameborder="0" class="w-full aspect-[16/9] md:aspect-[21/9] bg-black"></iframe>
+          <div class="w-full aspect-[16/9] md:aspect-[21/9] bg-black relative">
+            <div v-if="relicLoading" class="absolute inset-0 flex flex-col items-center justify-center text-v-gray-text-3 z-10">
+              <div style="width:32px;height:32px;border:2px solid rgba(255,255,255,0.1);border-top-color:white;border-radius:50%;animation:spin 1s linear infinite;"></div>
+              <span class="mt-4 text-sm">3D模型加载中…</span>
+            </div>
+            <iframe :src="selectedRelic.link" frameborder="0" class="w-full h-full" @load="relicLoading = false" :style="{ opacity: relicLoading ? 0 : 1 }"></iframe>
+          </div>
           <div class="p-6 md:p-10 max-w-4xl mx-auto">
             <h3 class="text-2xl font-semibold mb-4 text-white">文物详情</h3>
             <p class="text-v-gray-text-2 mb-8 leading-relaxed text-sm md:text-base">{{ selectedRelic.spec }}</p>
@@ -500,6 +506,16 @@ createApp({
         const relicsData = ref(relicsDataArray);
         const activeFilter = ref('All Periods');
         const selectedRelic = ref(null);
+        const relicLoading = ref(false);
+
+        const openRelicModal = (relic) => {
+          selectedRelic.value = relic;
+          relicLoading.value = true;
+        };
+        const closeRelicModal = () => {
+          selectedRelic.value = null;
+          relicLoading.value = false;
+        };
 
         const enterSite = () => {
           showHero.value = false;
@@ -550,6 +566,7 @@ createApp({
           featuredRelics,
           filteredRelics,
           selectedRelic,
+          relicLoading,
           openRelicModal,
           closeRelicModal,
         };
