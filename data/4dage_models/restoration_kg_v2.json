@@ -1,0 +1,616 @@
+{
+  "schema": "2.0",
+  "design": "RLVR GRPO Reward Layer 2: Historical Compliance Constraints",
+  "total_artifacts": 53,
+  "last_updated": "2026-06-30",
+  "material_taxonomy": {
+    "METAL_CU": {
+      "name": "铜合金",
+      "subtypes": [
+        "青铜(Cu-Sn-Pb)",
+        "黄铜(Cu-Zn)",
+        "紫铜"
+      ],
+      "artifacts": [
+        "jgs83",
+        "jgs84",
+        "jgs91",
+        "jgs94",
+        "jgs108",
+        "jgs109",
+        "jgs111",
+        "jgs116",
+        "jgs118",
+        "jgs120"
+      ],
+      "count": 10
+    },
+    "METAL_FE": {
+      "name": "铁/钢",
+      "subtypes": [
+        "铸铁",
+        "锻铁",
+        "低碳钢(近代)"
+      ],
+      "artifacts": [
+        "jgs71",
+        "jgs80",
+        "jgs87",
+        "jgs88",
+        "jgs99",
+        "jgs100",
+        "jgs101",
+        "jgs119"
+      ],
+      "count": 8
+    },
+    "CERAMIC": {
+      "name": "陶瓷/搪瓷",
+      "subtypes": [
+        "越窑青瓷(西晋)",
+        "青花(清)",
+        "粉彩(清)",
+        "红釉(清)",
+        "搪瓷(近代)"
+      ],
+      "artifacts": [
+        "jgs85",
+        "jgs96",
+        "jgs107",
+        "jgs112",
+        "jgs113",
+        "jgs114",
+        "jgs115",
+        "jgs123"
+      ],
+      "count": 8
+    },
+    "WOOD": {
+      "name": "竹木",
+      "subtypes": [
+        "硬木(黄花梨/紫檀/樟木)",
+        "软木(杉/松)",
+        "竹"
+      ],
+      "artifacts": [
+        "jgs72",
+        "jgs73",
+        "jgs74",
+        "jgs75",
+        "jgs76",
+        "jgs77",
+        "jgs79",
+        "jgs81",
+        "jgs82",
+        "jgs86",
+        "jgs90",
+        "jgs95",
+        "jgs97",
+        "jgs98",
+        "jgs110",
+        "jgs117",
+        "jgs121",
+        "jgs122"
+      ],
+      "count": 18
+    },
+    "PAPER": {
+      "name": "纸质",
+      "subtypes": [
+        "手工纸(宣纸/皮纸)",
+        "机制纸(近代)"
+      ],
+      "artifacts": [
+        "jgs102",
+        "jgs103",
+        "jgs104",
+        "jgs105",
+        "jgs106"
+      ],
+      "count": 5
+    },
+    "LEATHER_TEXTILE": {
+      "name": "皮革/织物",
+      "subtypes": [
+        "牛皮",
+        "棉布"
+      ],
+      "artifacts": [
+        "jgs78",
+        "jgs92"
+      ],
+      "count": 2
+    }
+  },
+  "damage_severity": {
+    "L1_CRITICAL": {
+      "desc": "结构失稳,威胁文物存续",
+      "reward_weight": 1.0,
+      "intervention": "必须修复",
+      "examples": [
+        "整体断裂",
+        "胎体酥解",
+        "纤维粉化"
+      ]
+    },
+    "L2_MAJOR": {
+      "desc": "加速劣化,需及时干预",
+      "reward_weight": 0.7,
+      "intervention": "强烈建议",
+      "examples": [
+        "粉状锈活跃",
+        "活虫蛀",
+        "氯离子腐蚀"
+      ]
+    },
+    "L3_MODERATE": {
+      "desc": "影响展示/研究",
+      "reward_weight": 0.4,
+      "intervention": "建议修复",
+      "examples": [
+        "釉面剥落",
+        "漆层起翘",
+        "残缺>10%面积"
+      ]
+    },
+    "L4_MINOR": {
+      "desc": "表面美观问题",
+      "reward_weight": 0.1,
+      "intervention": "可选",
+      "examples": [
+        "均匀稳定锈",
+        "微小裂纹<=0.1mm",
+        "表面灰尘"
+      ]
+    },
+    "L5_HISTORICAL": {
+      "desc": "历史痕迹,不应干预",
+      "reward_weight": -1.0,
+      "intervention": "禁止修复",
+      "examples": [
+        "弹痕",
+        "红军标语",
+        "使用磨损",
+        "火痕",
+        "烟熏痕迹"
+      ]
+    }
+  },
+  "hard_prohibitions": [
+    {
+      "id": "H001",
+      "desc": "铜器不得使用含氯清洗剂",
+      "material": [
+        "METAL_CU"
+      ],
+      "forbidden": [
+        "Cl-",
+        "HCl",
+        "NaCl",
+        "NH4Cl"
+      ],
+      "rationale": "氯离子催化青铜病循环反应 CuCl->Cu2(OH)3Cl",
+      "source": "[K] WW/T 0009-2007"
+    },
+    {
+      "id": "H002",
+      "desc": "铁器不得使用酸性除锈剂",
+      "material": [
+        "METAL_FE"
+      ],
+      "forbidden": [
+        "H2SO4",
+        "HCl",
+        "HNO3",
+        "H3PO4>10%"
+      ],
+      "rationale": "酸洗加速晶间腐蚀,破坏金相组织",
+      "source": "[K] WW/T 0010-2008"
+    },
+    {
+      "id": "H003",
+      "desc": "陶瓷补全禁用化学合成染料",
+      "material": [
+        "CERAMIC"
+      ],
+      "forbidden": [
+        "有机染料",
+        "化学颜料"
+      ],
+      "allowed": "矿物颜料(赭石/朱砂/石青/石绿/钴蓝/钛白)",
+      "rationale": "有机染料光老化变色不可逆",
+      "source": "[K] 古陶瓷修复行业共识"
+    },
+    {
+      "id": "H004",
+      "desc": "竹木器禁用含甲醛防腐剂",
+      "material": [
+        "WOOD"
+      ],
+      "forbidden": [
+        "HCHO",
+        "甲醛",
+        "戊二醛>2%"
+      ],
+      "rationale": "甲醛与木质素不可逆交联",
+      "source": "[I] 木质文物规范"
+    },
+    {
+      "id": "H005",
+      "desc": "纸质文物禁用化学漂白剂",
+      "material": [
+        "PAPER"
+      ],
+      "forbidden": [
+        "NaClO",
+        "H2O2>1%",
+        "KMnO4"
+      ],
+      "rationale": "氧化漂白加速纤维素降解,pH<5不可逆",
+      "source": "[I] 纸质修复规范"
+    },
+    {
+      "id": "H006",
+      "desc": "任何文物禁用不可逆粘接材料",
+      "material": [
+        "*"
+      ],
+      "forbidden": [
+        "氰基丙烯酸酯(502胶)",
+        "聚氨酯发泡胶"
+      ],
+      "rationale": "违反可逆性原则",
+      "source": "[K] 威尼斯宪章1964 Art.10"
+    },
+    {
+      "id": "H007",
+      "desc": "革命文物标语/笔迹不得清除覆盖",
+      "material": [
+        "*"
+      ],
+      "condition": "tag=revolutionary_inscription",
+      "rationale": "红色标语独立文物价值,优先于美学修复",
+      "source": "[K] 江西省革命文物保护条例2022"
+    },
+    {
+      "id": "H008",
+      "desc": "西晋青瓷禁用有机溶剂清洗",
+      "material": [
+        "CERAMIC"
+      ],
+      "condition": "era=西晋",
+      "forbidden": [
+        "丙酮",
+        "甲苯",
+        "二甲苯"
+      ],
+      "rationale": "胎釉结合弱(~1200C),溶剂渗透致剥落",
+      "source": "[I] 待核实"
+    },
+    {
+      "id": "H009",
+      "desc": "明代硬木家具禁用铁钉/螺丝",
+      "material": [
+        "WOOD"
+      ],
+      "condition": "era=明",
+      "forbidden": [
+        "铁钉",
+        "螺丝",
+        "金属角码"
+      ],
+      "rationale": "金属热膨胀致开裂,破坏鉴定特征",
+      "source": "[I] 明清家具规范"
+    }
+  ],
+  "soft_constraints": [
+    {
+      "id": "S001",
+      "desc": "修复材料热膨胀系数(CTE)与原件匹配",
+      "material": [
+        "*"
+      ],
+      "tolerance": "+/-2e-6/C",
+      "penalty_per_deviation": -0.05
+    },
+    {
+      "id": "S002",
+      "desc": "青花钴料须与朝代匹配(康熙浙料vs光绪洋蓝)",
+      "material": [
+        "CERAMIC"
+      ],
+      "penalty_if_mismatch": -0.15,
+      "note": "康熙浙料CoO+MnO翠蓝多层 vs 光绪洋蓝CoO+Fe2O3偏紫单薄"
+    },
+    {
+      "id": "S003",
+      "desc": "描金须用传统金箔(>=98%Au),禁用化学金粉",
+      "material": [
+        "WOOD"
+      ],
+      "condition": "tag=gold_decorated",
+      "penalty": -0.3,
+      "note": "铜锌合金粉(假金粉)会氧化变黑"
+    },
+    {
+      "id": "S004",
+      "desc": "修复面积<=原始损伤面积150%",
+      "material": [
+        "*"
+      ],
+      "max_ratio": 1.5,
+      "penalty_per_10pct_excess": -0.05
+    },
+    {
+      "id": "S005",
+      "desc": "金属修复后工具痕迹<50um",
+      "material": [
+        "METAL_CU",
+        "METAL_FE"
+      ],
+      "max_scratch_um": 50,
+      "penalty": -0.1
+    },
+    {
+      "id": "S006",
+      "desc": "陶瓷粘接缝<0.5mm",
+      "material": [
+        "CERAMIC"
+      ],
+      "max_gap_mm": 0.5,
+      "penalty": -0.08
+    }
+  ],
+  "era_style_constraints": [
+    {
+      "id": "E001",
+      "era": "西晋(265-420)",
+      "artifacts": [
+        "jgs123"
+      ],
+      "style": "越窑青瓷:铁还原焰青釉(青中泛黄),灰白胎有气孔,素面无彩,器型朴拙",
+      "forbidden": [
+        "不可按宋龙泉标准修复(粉青/梅子青差异大)",
+        "不可添加彩绘",
+        "不可打磨胎体至光滑"
+      ]
+    },
+    {
+      "id": "E002",
+      "era": "明(1368-1644)",
+      "artifacts": [
+        "jgs81"
+      ],
+      "style": "黄花梨/紫檀硬木,榫卯无铁钉,大漆处理,简洁洗练",
+      "forbidden": [
+        "不可髹不透明漆遮盖木纹",
+        "不可改清式繁琐雕刻",
+        "不可杂木替代"
+      ]
+    },
+    {
+      "id": "E003",
+      "era": "清康熙(1661-1722)",
+      "artifacts": [
+        "jgs115"
+      ],
+      "style": "浙料青花翠蓝(CoO+MnO),墨分五色,亮青釉,山水人物",
+      "forbidden": [
+        "不可用光绪洋蓝补色",
+        "不可添加粉彩(康熙无粉彩,始于雍正)"
+      ]
+    },
+    {
+      "id": "E004",
+      "era": "清光绪(1875-1908)",
+      "artifacts": [
+        "jgs112",
+        "jgs113"
+      ],
+      "style": "洋蓝偏紫(CoO+Fe2O3),粉彩(玻璃白打底柔和),釉面较薄",
+      "forbidden": [
+        "不可用康熙浙料代替洋蓝",
+        "不可将粉彩改为五彩硬彩"
+      ]
+    },
+    {
+      "id": "E005",
+      "era": "土地革命(1927-1937)",
+      "artifacts": [
+        "jgs85",
+        "jgs86",
+        "jgs87",
+        "jgs88",
+        "jgs89",
+        "jgs90",
+        "jgs91",
+        "jgs92",
+        "jgs94",
+        "jgs95",
+        "jgs96",
+        "jgs97",
+        "jgs98",
+        "jgs99",
+        "jgs100",
+        "jgs101",
+        "jgs107",
+        "jgs108",
+        "jgs109",
+        "jgs71"
+      ],
+      "style": "粗糙实用,手工痕迹明显,红军标语墨书粗犷,群众捐赠日用品",
+      "forbidden": [
+        "不可消除使用痕迹(磨损/磕碰/火痕/烟熏)",
+        "不可精细修复掩盖朴素性",
+        "标语不得描摹重描覆盖"
+      ]
+    },
+    {
+      "id": "E006",
+      "era": "建国后(1949-1965)",
+      "artifacts": [
+        "jgs102",
+        "jgs103",
+        "jgs104",
+        "jgs105",
+        "jgs106"
+      ],
+      "style": "郭沫若行书(1965井冈山题词),纸本墨迹,可能已酸化(pH<6)",
+      "forbidden": [
+        "领导人题词不可补笔",
+        "不可裁切原纸边缘",
+        "不可改变卷轴形制"
+      ]
+    }
+  ],
+  "repair_techniques": {
+    "CLEANING": [
+      "超声波清洗(20-40kHz,去离子水)",
+      "喷砂(Al2O3 50-100um)",
+      "去离子水浸泡(<=72h)",
+      "有机溶剂(丙酮/乙醇)",
+      "干洗(橡皮/面包屑)"
+    ],
+    "STABILIZATION": [
+      "BTA缓蚀(铜器,3%乙醇,30min)",
+      "鞣酸转化(铁器,5%水溶液)",
+      "脱酸(碳酸氢镁0.15mol/L)",
+      "熏蒸杀虫(环氧乙烷48h/氮气缺氧)"
+    ],
+    "CONSOLIDATION": [
+      "PEG渗透(木器,PEG4000 20%水溶液)",
+      "B72渗透(5-10%丙酮)",
+      "丙烯酸乳液(Primal AC33 3-5%)"
+    ],
+    "FILLING": [
+      "环氧树脂+矿物填料",
+      "石膏+矿物颜料(陶瓷)",
+      "同质木材补缺(同科属)",
+      "纸浆补洞(皮纸/楮纸+甲基纤维素)"
+    ],
+    "SURFACE": [
+      "B72封护(3-5%丙酮)",
+      "微晶石蜡封护(60-70C熔融)",
+      "传统大漆涂覆",
+      "金箔贴金(>=98%Au,0.1-0.15um)"
+    ]
+  },
+  "material_compatibility": {
+    "description": "修复材料x文物材质相容性, 1.0=最佳, 0.0=禁止",
+    "repair_materials": [
+      "Paraloid_B72",
+      "环氧树脂E44",
+      "BTA",
+      "鞣酸",
+      "PEG4000",
+      "矿物颜料",
+      "传统大漆",
+      "金箔>=98%Au"
+    ],
+    "matrix": {
+      "Paraloid_B72": {
+        "METAL_CU": 1.0,
+        "METAL_FE": 0.9,
+        "CERAMIC": 0.8,
+        "WOOD": 0.3,
+        "PAPER": 0.0
+      },
+      "环氧树脂E44": {
+        "METAL_CU": 0.7,
+        "METAL_FE": 0.7,
+        "CERAMIC": 0.9,
+        "WOOD": 0.5,
+        "PAPER": 0.0
+      },
+      "BTA": {
+        "METAL_CU": 1.0,
+        "METAL_FE": 0.0,
+        "CERAMIC": 0.0,
+        "WOOD": 0.0,
+        "PAPER": 0.0
+      },
+      "鞣酸": {
+        "METAL_CU": 0.0,
+        "METAL_FE": 1.0,
+        "CERAMIC": 0.0,
+        "WOOD": 0.0,
+        "PAPER": 0.0
+      },
+      "PEG4000": {
+        "METAL_CU": 0.0,
+        "METAL_FE": 0.0,
+        "CERAMIC": 0.0,
+        "WOOD": 0.85,
+        "PAPER": 0.0
+      },
+      "矿物颜料": {
+        "METAL_CU": 0.5,
+        "METAL_FE": 0.5,
+        "CERAMIC": 1.0,
+        "WOOD": 0.7,
+        "PAPER": 0.6
+      },
+      "传统大漆": {
+        "METAL_CU": 0.3,
+        "METAL_FE": 0.3,
+        "CERAMIC": 0.5,
+        "WOOD": 1.0,
+        "PAPER": 0.0
+      },
+      "金箔>=98%Au": {
+        "METAL_CU": 0.7,
+        "METAL_FE": 0.0,
+        "CERAMIC": 0.0,
+        "WOOD": 1.0,
+        "PAPER": 0.0
+      }
+    }
+  },
+  "pending_verification": [
+    {
+      "id": "V001",
+      "desc": "西晋青瓷胎釉结合强度定量数据",
+      "task": "A1"
+    },
+    {
+      "id": "V002",
+      "desc": "明代家具修复标准及木材鉴定方法",
+      "task": "A2"
+    },
+    {
+      "id": "V003",
+      "desc": "康熙浙料vs光绪洋蓝钴矿化学成分定量差异",
+      "task": "A3"
+    },
+    {
+      "id": "V004",
+      "desc": "清代描金漆器金箔纯度/厚度标准值",
+      "task": "A4"
+    },
+    {
+      "id": "V005",
+      "desc": "井冈山革命博物馆实际修复案例",
+      "task": "B2"
+    },
+    {
+      "id": "V006",
+      "desc": "WW/T标准号确认",
+      "task": "C2"
+    },
+    {
+      "id": "V007",
+      "desc": "BTA最优浓度(3%)和时间实验依据",
+      "task": "B1"
+    },
+    {
+      "id": "V008",
+      "desc": "PEG分子量与木材树种对应关系",
+      "task": "B3"
+    },
+    {
+      "id": "V009",
+      "desc": "搪瓷文物(铁胎瓷釉)专门修复规范",
+      "task": "NEW"
+    }
+  ]
+}
