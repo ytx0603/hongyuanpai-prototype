@@ -236,8 +236,8 @@
         <nav class="sticky top-0 z-50 bg-black/80 backdrop-blur-md border-b border-v-border">
           <div class="max-w-[1280px] mx-auto h-[64px] flex items-center justify-between px-6">
             <a href="platform.html" class="flex items-center gap-2.5 no-underline">
-              <img src="images/logo-small.png" alt="" style="width:22px;height:22px">
-              <span class="font-bold text-v-gray-text-1 text-xl tracking-tight">红源π</span>
+              <img src="images/logo-small.png" alt="" style="width:22px;height:22px" @click="enterSite">
+              <span class="font-bold text-v-gray-text-1 text-xl tracking-tight" @click="enterSite" style="cursor:pointer">红源π</span>
               <span class="relic-tag uppercase !tracking-[0.1em] text-[10px] hidden sm:inline">DIGITAL HERITAGE</span>
             </a>
             <div class="flex items-center gap-4">
@@ -346,7 +346,7 @@
               <div style="width:32px;height:32px;border:2px solid rgba(255,255,255,0.1);border-top-color:white;border-radius:50%;animation:spin 1s linear infinite;"></div>
               <span class="mt-4 text-sm">3D模型加载中…</span>
             </div>
-            <iframe :src="selectedRelic.link" frameborder="0" class="w-full h-full" @load="relicLoading = false" :style="{ opacity: relicLoading ? 0 : 1 }"></iframe>
+            <iframe :key="iframeKey" :src="selectedRelic.link" frameborder="0" class="w-full h-full" @load="relicLoading = false" :style="{ opacity: relicLoading ? 0 : 1 }"></iframe>
           </div>
           <div class="p-6 md:p-10 max-w-4xl mx-auto">
             <h3 class="text-2xl font-semibold mb-4 text-white">文物详情</h3>
@@ -507,18 +507,12 @@ createApp({
         const activeFilter = ref('All Periods');
         const selectedRelic = ref(null);
         const relicLoading = ref(false);
-
-        const openRelicModal = (relic) => {
-          selectedRelic.value = relic;
-          relicLoading.value = true;
-        };
-        const closeRelicModal = () => {
-          selectedRelic.value = null;
-          relicLoading.value = false;
-        };
+        const iframeKey = ref(0);
 
         const enterSite = () => {
           showHero.value = false;
+          selectedRelic.value = null;
+          relicLoading.value = false;
         };
 
         const uniquePeriods = computed(() => {
@@ -547,11 +541,15 @@ createApp({
 
         const openRelicModal = (relic) => {
           selectedRelic.value = relic;
+          relicLoading.value = true;
+          iframeKey.value++;
           document.body.style.overflow = 'hidden';
         };
 
         const closeRelicModal = () => {
           selectedRelic.value = null;
+          relicLoading.value = false;
+          iframeKey.value++;
           document.body.style.overflow = '';
         };
 
@@ -567,6 +565,7 @@ createApp({
           filteredRelics,
           selectedRelic,
           relicLoading,
+          iframeKey,
           openRelicModal,
           closeRelicModal,
         };
