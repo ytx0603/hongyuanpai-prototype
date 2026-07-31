@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>红源π — 红色文物保护 DIGITAL HERITAGE</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  </style>
+
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-inter: "Inter", sans-serif;
+      --color-v-black: #0d0d0d;
+      --color-v-dark: #0a0a0a;
+      --color-v-gray-card: rgba(255, 255, 255, 0.03);
+      --color-v-gray-text-1: #f0f0f0;
+      --color-v-gray-text-2: #a0a0a0;
+      --color-v-gray-text-3: #686868;
+      --color-v-accent: #C62828;
+      --color-v-accent-glow: #D43B3B;
+      --color-v-gold: #C4956A;
+      --color-v-border: rgba(255, 255, 255, 0.06);
+      --color-v-border-hover: rgba(255, 255, 255, 0.12);
+      --color-v-glass: rgba(255, 255, 255, 0.03);
+      --color-v-glass-hover: rgba(255, 255, 255, 0.06);
+      --color-v-glass-border: rgba(255, 255, 255, 0.06);
+    }
+  </style>
+
+  <style>
+    :root {
+      background-color: #0d0d0d;
+      color: #f0f0f0;
+      font-family: 'Inter', sans-serif;
+    }
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(198,40,40,0.08) 0%, transparent 70%),
+                  radial-gradient(ellipse 60% 50% at 80% 80%, rgba(196,149,106,0.04) 0%, transparent 60%),
+                  #0d0d0d;
+      min-height: 100vh;
+    }
+
+    /* ====== Glass utilities ====== */
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .glass-strong {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-2px);
+    }
+    .glass-button {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-button:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: scale(1.02);
+    }
+    .glass-button-primary {
+      background: rgba(198, 40, 40, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(198, 40, 40, 0.3);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-button-primary:hover {
+      background: rgba(198, 40, 40, 0.85);
+      border-color: rgba(198, 40, 40, 0.5);
+      transform: scale(1.02);
+    }
+
+    /* ====== Overlay ====== */
+    .glass-overlay {
+      background: linear-gradient(180deg, rgba(13,13,13,0.4) 0%, rgba(13,13,13,0.6) 100%);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* ====== Scrollbar ====== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0d0d0d; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+    [v-cloak] { display: none !important; }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .hero-heading { font-size: 2.5rem !important; line-height: 1.08 !important; }
+      .hero-right-text { font-size: 11px !important; letter-spacing: 0.1em !important; padding: 0 1rem; }
+      .section-year-waterfall { font-size: clamp(80px, 18vw, 120px) !important; }
+    }
+
+    /* Transitions */
+    .hero-fade-enter-active, .hero-fade-leave-active {
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-fade-leave-to { opacity: 0; transform: scale(1.05); }
+    .content-fade-enter-active { transition: opacity 0.8s ease 0.3s; }
+    .content-fade-enter-from { opacity: 0; }
+
+    /* Hero bg */
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 100% 70% at 50% -10%, rgba(198,40,40,0.12) 0%, transparent 70%),
+                  radial-gradient(ellipse 80% 50% at 20% 60%, rgba(196,149,106,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse 60% 60% at 80% 40%, rgba(198,40,40,0.04) 0%, transparent 50%);
+    }
+
+    /* Triangle */
+    .glowing-triangle {
+      width: clamp(200px, 30vw, 400px);
+      aspect-ratio: 200 / 173;
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+      background: rgba(198,40,40,0.15);
+      backdrop-filter: blur(12px) saturate(120%);
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+    }
+    .glowing-triangle-wrapper {
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.5)) drop-shadow(0 0 60px rgba(255,255,255,0.25)) drop-shadow(0 0 120px rgba(255,255,255,0.12));
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glowing-triangle-wrapper:hover {
+      filter: drop-shadow(0 0 30px rgba(255,255,255,0.5)) drop-shadow(0 0 80px rgba(255,255,255,0.25));
+      transform: scale(1.03);
+    }
+
+    /* Sections */
+    .section-accent {
+      display: inline-block; width: 40px; height: 2px;
+      background: linear-gradient(90deg, #C62828, transparent);
+      border-radius: 1px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #f0f0f0 0%, #C4956A 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .ambient-glow {
+      position: absolute; pointer-events: none;
+      border-radius: 50%; filter: blur(80px); opacity: 0.3;
+    }
+
+    /* Cards */
+    .relic-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    .relic-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.14);
+      transform: translateY(-3px);
+    }
+
+    /* Filter pills */
+    .filter-capsule {
+      height: 32px; padding: 0 14px; border-radius: 8px; font-size: 13px;
+      display: inline-flex; align-items: center;
+      transition: all 200ms ease;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #a0a0a0; cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+    .filter-capsule:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12); color: #f0f0f0;
+    }
+    .filter-capsule.active {
+      background: rgba(198, 40, 40, 0.6);
+      border-color: rgba(198, 40, 40, 0.3); color: #ffffff;
+    }
+    .relic-tag {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      background: rgba(255, 255, 255, 0.06); color: #a0a0a0;
+      font-size: 11px; line-height: 1; letter-spacing: 0.03em;
+    }
+
+    /* Modal */
+    .relic-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(13, 13, 13, 0.7);
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      z-index: 1000; display: flex; justify-content: center; align-items: center;
+      opacity: 0; pointer-events: none; transition: opacity 400ms ease;
+    }
+    .relic-modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .relic-modal {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      width: 90vw; height: 90vh; max-width: 1200px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 24px 48px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column;
+    }
+
+    .featured-scroll::-webkit-scrollbar { display: none; }
+    .featured-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+
+  <link rel="stylesheet" href="glass-theme.css">
+</head>
+<body>
+
+<!-- 极光背景层（替代 glassify 位移滤镜氛围） -->
+  <div class="lg-bg" aria-hidden="true">
+    <div class="lg-aurora"><span class="lg-ab1"></span><span class="lg-ab2"></span><span class="lg-ab3"></span></div>
+    <div class="lg-noise"></div>
+    <div class="lg-vignette"></div>
+  </div>
+
+  <div id="app" v-cloak>
+
+    <!-- Hero Gate -->
+    <transition name="hero-fade">
+      <div v-if="showHero" class="fixed inset-0 z-[100] text-white flex flex-col h-screen overflow-hidden" style="background:#0d0d0d">
+        <div class="hero-bg"></div>
+
+        <!-- Liquid Glass Nav -->
+        <header class="absolute top-0 left-0 right-0 z-50 mx-6 md:mx-10 mt-6">
+          <div class="rounded-full px-8 py-2.5 flex justify-between items-center text-sm max-w-[1600px] mx-auto glass" style="position:relative;background:rgba(255,255,255,0.08);backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);border:1px solid rgba(255,255,255,0.04);z-index:10">
+            <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+            <div class="flex items-center gap-6">
+              <img src="images/logo-small.png" alt="红源π" class="w-6 h-6 object-contain">
+              <nav class="hidden md:flex gap-4 font-medium" style="color:rgba(255,255,255,0.55)">
+                <a href="index_v3.html?skipHero=1" class="hover:text-white transition">Digital Twin</a>
+                <a @click.prevent="enterSite('hongyuanpi')" href="#" class="hover:text-white transition">Hongyuanπ</a>
+                <a @click.prevent="enterSite('timeline')" href="#" class="hover:text-white transition">Timeline</a>
+                <a @click.prevent="enterSite('partners')" href="#" class="hover:text-white transition">Partners</a>
+              </nav>
+            </div>
+            <div class="flex items-center gap-4 font-medium">
+              <button class="glass-button !py-1.5 !px-5 text-sm !rounded-full" style="color:rgba(255,255,255,0.6)">Docs</button>
+              <button @click="enterSite" class="glass-button-primary !py-1.5 !px-6 text-sm text-white font-semibold !rounded-full">Enter System</button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Hero Content -->
+        <div class="flex-1 flex flex-col justify-center relative w-full max-w-[1600px] mx-auto px-6 md:px-10 h-full pt-24">
+          <div class="grid grid-cols-1 md:grid-cols-3 items-center w-full h-full relative">
+
+            <!-- Left -->
+            <div class="flex flex-col items-start z-20 order-2 md:order-1 mt-10 md:mt-0">
+              <h1 class="hero-heading text-5xl sm:text-6xl lg:text-[5.5rem] font-bold leading-[1.05] tracking-tighter mb-6 sm:mb-8">
+                <span class="gradient-text">Digital<br>Heritage<br>Archive</span>
+              </h1>
+              <div class="flex flex-wrap gap-3 sm:gap-4">
+                <button @click="enterSite()" class="glass-button-primary px-5 sm:px-6 py-3 rounded-full font-semibold text-[14px] sm:text-[15px] flex items-center gap-2 text-white">
+                  Explore Now
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </button>
+                <button class="hidden sm:inline-flex glass-button px-6 py-3 rounded-full font-semibold text-[15px]" style="color:rgba(255,255,255,0.7)">
+                  了解更多
+                </button>
+              </div>
+            </div>
+
+            <!-- Center Triangle -->
+            <div class="flex justify-center items-center z-10 order-1 md:order-2 glowing-triangle-wrapper">
+               <div class="glowing-triangle"></div>
+            </div>
+
+            <!-- Right -->
+            <div class="hero-right-text flex flex-row md:flex-col md:items-end z-20 text-left md:text-right gap-4 md:gap-0 md:space-y-3 font-mono text-xs md:text-sm tracking-[0.15em] order-3 mt-8 md:mt-0 px-2 md:px-0" style="color:rgba(255,255,255,0.35)">
+              <p>FOR CULTURAL HERITAGE</p>
+              <p>TO PRESERVE RED RELICS</p>
+              <p>PRESENTED IN 3D</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Logos -->
+        <div class="absolute bottom-6 left-0 right-0 flex justify-center items-center gap-4 sm:gap-8 md:gap-16 px-4 sm:px-6 flex-wrap pb-4 sm:pb-6 md:pb-0" style="color:rgba(255,255,255,0.2)">
+           <div class="font-bold text-sm sm:text-lg md:text-xl tracking-tighter">JINGGANGSHAN MUSEUM</div>
+           <div class="font-serif italic text-sm sm:text-lg md:text-xl tracking-tight">Red Source Pi</div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Main Content -->
+    <transition name="content-fade">
+      <main v-if="!showHero" class="min-h-screen relative z-10">
+
+        <!-- Nav（药丸型） -->
+        <nav class="lg-pill-nav">
+          <div class="w-full h-[52px] flex items-center justify-between px-6">
+            <a href="platform.html" class="flex items-center gap-2.5 no-underline">
+              <img src="images/logo-small.png" alt="" style="width:22px;height:22px">
+              <span class="font-bold text-v-gray-text-1 text-xl tracking-tight">红源π</span>
+              <span class="relic-tag uppercase !tracking-[0.1em] text-[10px] hidden sm:inline">DIGITAL HERITAGE</span>
+            </a>
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium" style="color:rgba(255,255,255,0.5)">
+              <a href="index_v3.html?skipHero=1" class="hover:text-white transition">Digital Twin</a>
+              <a href="#" @click.prevent="scrollTo('hongyuanpi')" class="hover:text-white transition">Hongyuanπ</a>
+              <a href="#" @click.prevent="scrollTo('timeline')" class="hover:text-white transition">Timeline</a>
+              <a href="#" @click.prevent="scrollTo('partners')" class="hover:text-white transition">Partners</a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Section 1: Digital Twin -->
+        <section id="digital-twin" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 pt-28 pb-24 overflow-hidden">
+          <div class="ambient-glow" style="width:600px;height:600px;background:rgba(198,40,40,0.08);top:-20%;left:-10%"></div>
+          <div class="absolute inset-0 grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6" style="opacity:0.2;gap:0">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs71.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs82.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs85.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs86.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs89.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs91.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs93.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs94.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs97.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs99.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs101.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs104.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs107.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs110.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs112.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs115.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs117.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs119.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs121.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs123.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs81.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs83.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs84.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs87.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs88.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs90.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs92.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs95.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs96.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs98.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs100.jpg" class="w-full aspect-square object-cover" loading="lazy">
+            <img src="https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/jgs102.jpg" class="w-full aspect-square object-cover" loading="lazy">
+          </div>
+          <div class="absolute inset-0 glass-overlay"></div>
+          <div class="relative z-10">
+            <div class="section-accent mb-4"></div>
+            <p class="uppercase text-xs font-medium tracking-[0.18em] mb-4" style="color:rgba(255,255,255,0.4)">Section 01</p>
+            <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(36px,6vw,72px)">数字孪生档案</h2>
+            <p class="text-lg md:text-xl max-w-xl mb-12" style="color:rgba(255,255,255,0.5)">井冈山革命文物 · 高精度三维数字化记录</p>
+            <a href="index_v3.html?skipHero=1" class="glass-button-primary inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[15px] text-white no-underline">
+              Explore Relics
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </section>
+
+        <!-- Section 2: Hongyuanπ -->
+        <section id="hongyuanpi" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:url('images/team.jpg') center/cover no-repeat">
+          <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(13,13,13,0.6) 0%, rgba(13,13,13,0.8) 100%);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)"></div>
+          <div class="relative z-10">
+            <div class="section-accent mb-4"></div>
+            <p class="uppercase text-xs font-medium tracking-[0.18em] mb-4" style="color:rgba(255,255,255,0.4)">Section 02</p>
+            <h2 class="font-bold leading-none tracking-[-0.045em] mb-4 gradient-text" style="font-size:clamp(36px,6vw,72px)">红源π</h2>
+            <p class="text-lg md:text-xl max-w-xl mb-12" style="color:rgba(255,255,255,0.5)">基于数智融合的革命文物活化研究新范式</p>
+            <a href="hongyuanpi.html" class="glass-button-primary inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[15px] text-white no-underline">
+              Learn More
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </section>
+
+        <!-- Section 3: Timeline -->
+        <section id="timeline" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24 overflow-hidden">
+          <div class="ambient-glow" style="width:500px;height:500px;background:rgba(196,149,106,0.06);bottom:-20%;right:-10%"></div>
+          <div class="section-year-waterfall absolute inset-0 flex flex-col justify-between" style="padding:5vh 0;font-size:clamp(140px,20vw,300px);font-weight:800;letter-spacing:-0.08em;line-height:0.75;color:rgba(255,255,255,0.04);pointer-events:none;user-select:none">
+            <div style="text-align:center;margin-left:-12%">2017</div>
+            <div style="text-align:center;margin-right:-10%">2019</div>
+            <div style="text-align:center;margin-left:-6%">2021</div>
+            <div style="text-align:center;margin-right:-6%">2023</div>
+            <div style="text-align:center;margin-left:-12%">2024</div>
+            <div style="text-align:center;margin-right:-10%">2025</div>
+            <div style="text-align:center;margin-left:-8%">2026</div>
+          </div>
+          <div class="absolute inset-0" style="background:linear-gradient(180deg, #0d0d0d 0%, transparent 20%, transparent 80%, #0d0d0d 100%)"></div>
+          <div class="relative z-10">
+            <div class="section-accent mb-4"></div>
+            <p class="uppercase text-xs font-medium tracking-[0.18em] mb-4" style="color:rgba(255,255,255,0.4)">Section 03</p>
+            <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(36px,6vw,72px)">发展历程</h2>
+            <p class="text-lg md:text-xl max-w-xl mb-12" style="color:rgba(255,255,255,0.5)">从井冈山到数字未来 · 我们的每一步</p>
+            <a href="timeline.html" class="glass-button-primary inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[15px] text-white no-underline">
+              View Timeline
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </section>
+
+        <!-- Section 4: Partners -->
+        <section id="partners" class="relative w-full min-h-screen flex flex-col items-center justify-center text-center px-6 py-24" style="background:url('images/partners.jpg') center/cover no-repeat">
+          <div class="absolute inset-0" style="background:linear-gradient(180deg, rgba(13,13,13,0.5) 0%, rgba(13,13,13,0.75) 100%);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)"></div>
+          <div class="relative z-10">
+            <div class="section-accent mb-4"></div>
+            <p class="uppercase text-xs font-medium tracking-[0.18em] mb-4" style="color:rgba(255,255,255,0.4)">Section 04</p>
+            <h2 class="font-bold text-white leading-none tracking-[-0.045em] mb-4" style="font-size:clamp(36px,6vw,72px)">合作单位</h2>
+            <p class="text-lg md:text-xl max-w-xl mb-12" style="color:rgba(255,255,255,0.5)">井冈山革命博物馆 · 江西师范大学 · 瑞金叶坪</p>
+            <a href="partners.html" class="glass-button-primary inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-[15px] text-white no-underline">
+              View Partners
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-12 border-t text-center text-sm" style="border-color:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5)">
+          <p class="mb-2">© 2026 红源π数字化革命文物保护项目</p>
+          <p class="font-mono text-xs opacity-50">DIGITAL HERITAGE | AI + ARCHIVE</p>
+        </footer>
+      </main>
+    </transition>
+
+    <!-- Modal -->
+    <div class="relic-modal-overlay" :class="{ open: !!selectedRelic }" @click.self="closeRelicModal">
+      <div v-if="selectedRelic" class="relic-modal">
+        <div class="h-14 px-5 border-b flex items-center justify-between glass" style="border-color:rgba(255,255,255,0.06)">
+           <div class="flex items-baseline gap-2">
+            <span class="relic-tag mt-0.5">{{ selectedRelic.category }}</span>
+            <h5 class="font-semibold text-v-gray-text-1 text-lg tracking-tight">{{ selectedRelic.name }}</h5>
+            <span class="text-v-gray-text-3 text-xs ml-1 font-mono">[{{ selectedRelic.id }}]</span>
+           </div>
+           <button class="filter-capsule !px-2 !rounded-full text-xs" @click="closeRelicModal">CLOSE ×</button>
+        </div>
+        <div class="flex-1 overflow-y-auto" style="background:rgba(0,0,0,0.3)">
+          <iframe :src="selectedRelic.link" frameborder="0" class="w-full aspect-[16/9] md:aspect-[21/9]" style="background:rgba(0,0,0,0.5)"></iframe>
+          <div class="p-6 md:p-10 max-w-4xl mx-auto">
+            <h3 class="text-2xl font-semibold mb-4" style="color:rgba(255,255,255,0.9)">文物详情</h3>
+            <p class="mb-8 leading-relaxed text-sm md:text-base" style="color:rgba(255,255,255,0.5)">{{ selectedRelic.spec }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm pt-6" style="border-top:1px solid rgba(255,255,255,0.04)">
+              <div><span style="color:rgba(255,255,255,0.3)">时期:</span> <span class="font-medium ml-2" style="color:rgba(255,255,255,0.8)">{{ selectedRelic.period }}</span></div>
+              <div><span style="color:rgba(255,255,255,0.3)">材质:</span> <span class="font-medium ml-2" style="color:rgba(255,255,255,0.8)">{{ selectedRelic.material }}</span></div>
+              <div><span style="color:rgba(255,255,255,0.3)">级别:</span> <span class="font-medium ml-2" style="color:rgba(255,255,255,0.8)">{{ selectedRelic.level }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    const { createApp, ref, computed } = Vue;
+
+    const periodOrder = {
+      "西晋": 0, "明代": 100, "清康熙": 200, "清": 250, "清光绪": 300,
+      "民国": 400, "20世纪20年代初期": 450, "1926年": 460, "1927-1937年": 470,
+      "1928年": 480, "1930年代初期": 490, "1931年": 500, "1949年": 600,
+      "1965年5月": 700, "1965年6月": 710, "1965年7月": 720
+    };
+
+    const relicsDataArray = [
+      { id: 1, name: "1930年代初期湘赣省地方武装使用的抬枪", spec: "枪管直径4.1cm", period: "1930年代初期", material: "木，铁", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs71&v=1" },
+      { id: 2, name: "明太师木圈椅", spec: "", period: "明代", material: "木", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs81&v=1" },
+      { id: 3, name: "民国龙凤椅", spec: "", period: "民国", material: "复合材质", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs82&v=1" },
+      { id: 4, name: "民国无纹带铜烟盒", spec: "", period: "民国", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs83&v=1" },
+      { id: 5, name: "民国无纹铜烟杆", spec: "", period: "民国", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs84&v=1" },
+      { id: 6, name: "1928年红军送给李尚发的搪瓷杯", spec: "底径10cm，通高14cm", period: "1928年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs85&v=1" },
+      { id: 7, name: "1928年黄洋界保卫战群众给红军送子弹使用的木箱", spec: "长26cm，宽19.5cm，高10.5cm", period: "1928年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs86&v=1" },
+      { id: 8, name: "1928年宁冈县四区二乡工农兵政府使用的马灯残架", spec: "底口径14.2cm，通高35cm", period: "1928年", material: "铁", category: "办公用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs87&v=1" },
+      { id: 9, name: "1928年宁冈县四区二乡工农兵政府使用的马灯", spec: "底径14.2cm，通高35cm", period: "1928年", material: "玻璃，铁", category: "办公用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs88&v=1" },
+      { id: 10, name: "1949年天津解放时黄克诚赠陈正人的半导体收音机", spec: "通长15cm，通宽29cm，通高18.5cm", period: "1949年", material: "铁，其他无机质", category: "名人遗物", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs89&v=1" },
+      { id: 11, name: "1928年永新县某乡工农兵政府主席尹初官使用的印盒", spec: "长5.4cm，宽1.8cm，厚1.5cm", period: "1928年", material: "铁", category: "玺印符牌", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs90&v=1" },
+      { id: 12, name: "1928年红军送给井冈山群众李富祥的铜脸盆", spec: "口径34cm，底径20cm，通高7.5cm", period: "1928年", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs91&v=1" },
+      { id: 13, name: "1928年红军打土豪分给宁冈县群众的绣花小脚布鞋", spec: "长14.8cm，宽4.4cm，厚8.5cm", period: "1928年", material: "棉麻纤维", category: "服装标识", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs92&v=1" },
+      { id: 14, name: "清镂雕描金人文故事图案诗词挂屏", spec: "纵154cm，横194cm，厚3cm", period: "清", material: "木", category: "雕塑", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs93&v=1" },
+      { id: 15, name: "20世纪20年代初期原湘军赵恒惕部第二旅二团士兵贺国中使用的铜笔架", spec: "纵9cm，横4cm，高7.4cm", period: "20世纪20年代初期", material: "铜", category: "名人遗物", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs94&v=1" },
+      { id: 16, name: "1926年「永新六区厚溪第五乡农民协会」条形木印", spec: "纵9.8cm，横1.8cm，厚2.8cm", period: "1926年", material: "木", category: "玺印符牌", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs95&v=1" },
+      { id: 17, name: "1928年红军送给李尚发的搪瓷脸盆", spec: "口径35cm，底径18cm", period: "1928年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs96&v=1" },
+      { id: 18, name: "1931年墨书红军标语的木窗板", spec: "纵66.5cm，横36.5cm，厚度2cm", period: "1931年", material: "木", category: "宣传标语", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs97&v=1" },
+      { id: 19, name: "1931年写有红军标语的木窗门板", spec: "纵66.5cm，横36.5cm，厚度2cm", period: "1931年", material: "木", category: "宣传标语", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs98&v=1" },
+      { id: 20, name: "1931年湘赣省军区兵工厂制造的手榴弹", spec: "弹头直径3.8cm，弹头直径1.6cm，通长11.8cm", period: "1931年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs99&v=1" },
+      { id: 21, name: "1931年湘赣省军区兵工厂制造的手榴弹", spec: "弹头直径3.8cm，弹头直径1.6cm，通长11.7cm", period: "1931年", material: "木，铁", category: "武器类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs100&v=1" },
+      { id: 22, name: "1931年中共湘赣省委宣传部长甘露使用过的铁香烟盒", spec: "纵9.2cm，横1.5cm，高8.5cm", period: "1931年", material: "铁，其他无机质", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs101&v=1" },
+      { id: 23, name: "1965年5月湖南省委书记张平化井冈山题写的七言诗轴", spec: "画心纵64cm，横33cm，整体纵190cm，横47.5cm", period: "1965年5月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs102&v=1" },
+      { id: 24, name: "1965年6月解放军空军副司令员曹里怀在井冈山题写的七言诗轴", spec: "画心纵96cm，横52cm，整体纵205cm，横66.5cm", period: "1965年6月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs103&v=1" },
+      { id: 25, name: "1965年7月郭沫若题词「井冈山大井革命群众集体殉难纪念亭」卷轴", spec: "画心纵16.7cm，横158.5cm，整体纵29cm，横206cm", period: "1965年7月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs104&v=1" },
+      { id: 26, name: "1965年7月郭沫若题「井冈山光荣敬老院」卷轴", spec: "画心纵21.3cm，横137.3cm，整体纵32cm，横184cm", period: "1965年7月", material: "纸", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs105&v=1" },
+      { id: 27, name: "1965年7月郭沫若题写「井冈山小学」卷轴", spec: "画心纵22.2cm，横74.5cm，整体纵32.8cm，横126.5cm", period: "1965年7月", material: "纸，木", category: "题词手稿", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs106&v=1" },
+      { id: 28, name: "第二次国内革命战争时期红军战士罗初林使用的搪瓷脸盆", spec: "口径35cm，底径18cm", period: "1927-1937年", material: "铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs107&v=1" },
+      { id: 29, name: "第二次国内革命战争时期中华苏维埃共和国国家银行伍分铜币", spec: "直径2.6cm，厚度0.2cm", period: "1927-1937年", material: "铜", category: "钱币", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs108&v=1" },
+      { id: 30, name: "第二次国内革命战争时期中华苏维埃共和国国家银行壹分铜币", spec: "直径1.7cm，厚度0.11cm", period: "1927-1937年", material: "铜", category: "钱币", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs109&v=1" },
+      { id: 31, name: "清光绪木刻描金八仙人物花卉图案诗词挂屏", spec: "纵170cm，横184cm，厚3.7cm", period: "清光绪", material: "木", category: "雕塑", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs110&v=1" },
+      { id: 32, name: "清福禄纹烟丝铜盒", spec: "底纵3cm，横6.5cm，高6.4cm", period: "清", material: "铜", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs111&v=1" },
+      { id: 33, name: "清光绪粉彩花鸟纹攒盘", spec: "纵31.5cm，横31.5cm，高10.5cm", period: "清光绪", material: "木，瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs112&v=1" },
+      { id: 34, name: "清光绪青花山水人物纹笔筒", spec: "口径13cm，底径12.6cm，高14cm", period: "清光绪", material: "瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs113&v=1" },
+      { id: 35, name: "清红釉束口三足香炉", spec: "口径14.5cm，高13.2cm，腹围51.5cm", period: "清", material: "瓷", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs114&v=1" },
+      { id: 36, name: "清康熙青花龙纹香炉", spec: "口径22.2cm，底径20.5cm，高20.4cm", period: "清康熙", material: "瓷", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs115&v=1" },
+      { id: 37, name: "清龙尾挂式铜油灯架", spec: "底径13.2cm，通高20.5cm", period: "清", material: "铜", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs116&v=1" },
+      { id: 38, name: "清描金江夏堂神祖牌", spec: "通长23.5cm，通宽42.5cm，通高49.2cm", period: "清", material: "木", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs117&v=1" },
+      { id: 39, name: "清钱纹铜水烟枪", spec: "底长7.3cm，横3.5cm，通高10.5cm", period: "清", material: "铜", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs118&v=1" },
+      { id: 40, name: "清塔形双层铁烛台", spec: "底边8.6cm，通高29.4cm", period: "清", material: "铁，宝玉石", category: "宗教祭祀", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs119&v=1" },
+      { id: 41, name: "清铜挂饰", spec: "挂筒长7.1cm，口径0.8cm，通长30cm", period: "清", material: "铜，棉麻纤维", category: "其他", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs120&v=1" },
+      { id: 42, name: "清腰形首饰竹盒", spec: "底纵12.5cm，横22.6cm，高11.2cm", period: "清", material: "竹，铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs121&v=1" },
+      { id: 43, name: "清腰形首饰竹盒", spec: "底纵9.8cm，横16.7cm，高8cm", period: "清", material: "竹，铁", category: "生活用品", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs122&v=1" },
+      { id: 44, name: "西晋青瓷唾壶", spec: "口径8.3cm，底径9.5cm，高9.8cm", period: "西晋", material: "瓷", category: "器物类", level: "三级", link: "https://4dscene.4dage.com/culturalrelics/JGSGMBWG/Model.html?m=jgs123&v=1" }
+    ];
+
+    createApp({
+      setup() {
+        const getThumb = (item) => {
+          const m = item.link.match(/m=([^&]+)/);
+          return m ? 'https://4dscene.4dage.com/culturalrelics/JGSGMBWG/images/' + m[1] + '.jpg' : '';
+        };
+        const showHero = ref(false); // 入口页直接进入主内容，跳过欢迎页
+        const relicsData = ref(relicsDataArray);
+        const activeFilter = ref('All Periods');
+        const selectedRelic = ref(null);
+
+        const enterSite = (target) => {
+          showHero.value = false;
+          if (target) {
+            setTimeout(() => {
+              const el = document.getElementById(target);
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 700);
+          }
+        };
+
+        const uniquePeriods = computed(() => {
+          const all = relicsData.value.map(r => r.period).filter(Boolean);
+          const distinct = [...new Set(all)];
+          distinct.sort((a, b) => (periodOrder[b] ?? -1) - (periodOrder[a] ?? -1));
+          return ['All Periods', ...distinct];
+        });
+
+        const featuredRelics = computed(() => { const ids = [1, 6, 14, 18, 25, 44]; return ids.map(id => relicsData.value.find(r => r.id === id)).filter(Boolean); });
+
+        const filteredRelics = computed(() => {
+          let result;
+          if (activeFilter.value === 'All Periods') {
+            result = [...relicsData.value];
+          } else {
+            result = relicsData.value.filter(relic => relic.period === activeFilter.value);
+          }
+          result.sort((a, b) => (periodOrder[b.period] ?? -1) - (periodOrder[a.period] ?? -1));
+          return result;
+        });
+
+        const setFilter = (period) => { activeFilter.value = period; };
+
+        const openRelicModal = (relic) => {
+          selectedRelic.value = relic;
+          document.body.style.overflow = 'hidden';
+        };
+
+        const closeRelicModal = () => {
+          selectedRelic.value = null;
+          document.body.style.overflow = '';
+        };
+
+        const scrollTo = (id) => {
+          const el = document.getElementById(id);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Auto-scroll on hash (e.g. platform.html#timeline)
+        if (location.hash) {
+          const target = location.hash.slice(1);
+          enterSite(target);
+        }
+
+        return { getThumb, showHero, enterSite, scrollTo, relicsData, uniquePeriods, activeFilter, setFilter, featuredRelics, filteredRelics, selectedRelic, openRelicModal, closeRelicModal };
+      }
+    }).mount('#app');
+  </script>
+  <script src="glass-theme.js"></script>
+</body>
+</html>
